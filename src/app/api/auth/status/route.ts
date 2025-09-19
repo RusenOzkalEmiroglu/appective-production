@@ -13,9 +13,10 @@ export async function GET(req: NextRequest) {
     }
 
     const token = authHeader.substring(7);
-    const { data: { user }, error } = await supabaseAuth.getUser();
+    const { data: { user }, error } = await supabaseAuth.getUserWithToken(token);
 
     if (error || !user) {
+      console.error('Auth status error:', error);
       return NextResponse.json({ 
         isAuthenticated: false, 
         isAdmin: false 
@@ -23,6 +24,7 @@ export async function GET(req: NextRequest) {
     }
 
     const isAdmin = user.user_metadata?.role === 'admin' || 
+                   user.app_metadata?.role === 'admin' ||
                    user.email?.endsWith('@appective.net');
 
     return NextResponse.json({ 
@@ -31,7 +33,7 @@ export async function GET(req: NextRequest) {
       user: {
         id: user.id,
         email: user.email,
-        role: user.user_metadata?.role || 'admin'
+        role: user.user_metadata?.role || user.app_metadata?.role || 'admin'
       }
     });
 

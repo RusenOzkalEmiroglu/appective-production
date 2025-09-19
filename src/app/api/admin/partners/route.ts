@@ -1,19 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabase, supabaseAuth } from '@/lib/supabase';
 
 // Helper function to verify admin authentication
 async function verifyAdmin(request: NextRequest) {
   const authHeader = request.headers.get('authorization');
   if (!authHeader?.startsWith('Bearer ')) {
+    console.error('No auth header found');
     return null;
   }
 
   const token = authHeader.substring(7);
   
   try {
-    const { data: { user }, error } = await supabase.auth.getUser(token);
+    const { data: { user }, error } = await supabaseAuth.getUserWithToken(token);
     
     if (error || !user) {
+      console.error('User verification failed:', error);
       return null;
     }
 
@@ -21,6 +23,13 @@ async function verifyAdmin(request: NextRequest) {
     const isAdmin = user.app_metadata?.role === 'admin' || 
                    user.user_metadata?.role === 'admin' || 
                    user.email?.endsWith('@appective.net');
+
+    console.log('User verification:', { 
+      email: user.email, 
+      isAdmin, 
+      app_metadata: user.app_metadata,
+      user_metadata: user.user_metadata 
+    });
 
     return isAdmin ? user : null;
   } catch (error) {

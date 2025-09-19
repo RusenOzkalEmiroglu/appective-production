@@ -14,22 +14,35 @@ async function checkAdminAuth(req: NextRequest): Promise<boolean> {
   try {
     const authHeader = req.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.log('❌ No auth header found');
       return false;
     }
 
     const token = authHeader.substring(7);
+    console.log('🔑 Checking token:', token.substring(0, 20) + '...');
+    
     const { data: { user }, error } = await supabase.auth.getUser(token);
     
     if (error || !user) {
+      console.log('❌ Auth error:', error?.message || 'No user found');
       return false;
     }
 
     // Check if user has admin role in app_metadata or user_metadata
-    return user.app_metadata?.role === 'admin' || 
+    const isAdmin = user.app_metadata?.role === 'admin' || 
            user.user_metadata?.role === 'admin' || 
            user.email?.endsWith('@appective.net') || false;
+           
+    console.log('👤 User check:', { 
+      email: user.email, 
+      isAdmin,
+      app_metadata: user.app_metadata,
+      user_metadata: user.user_metadata 
+    });
+    
+    return isAdmin;
   } catch (error) {
-    console.error('Auth check error:', error);
+    console.error('❌ Auth check error:', error);
     return false;
   }
 }

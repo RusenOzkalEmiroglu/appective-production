@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Doritos x Pepsi Masthead</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="masthead">
+    <div class="left-panel">
+      <div class="logo-row" style="display:flex;align-items:center;justify-content:center;height:100%;">
+        <a href="https://www.pepsi.com.tr/" target="_blank">
+          <img src="images/logolar/pepsi1_logo.png" alt="Pepsi Logo" class="logo-img" style="height:100px;width:auto;display:block;position:absolute;left:48px;top:calc(50% + 65px);transform:translateY(-50%);" />
+        </a>
+        <span style="display:block;text-align:center;font-family:'Arial Black',Arial,sans-serif;font-weight:bold;font-size:52px;color:#222;z-index:10;"></span>
+        <a href="https://www.doritos.com.tr/" target="_blank">
+          <img src="images/logolar/doritos_logo.png" alt="Doritos Logo" class="logo-img" style="height:100px;width:auto;display:block;position:absolute;left:50px;top:calc(50% - 75px);transform:translateY(-50%);" />
+        </a>
+      </div>
+      <img src="images/pepsi_sise.png" alt="Pepsi Şişesi" class="pepsi-sise-logo" style="position:absolute;left:87px;top:50%;transform:translateY(-43.5%);height:150px;width:auto;" />
+    </div>
+    <img src="images/ai4.png" alt="Ekstra Görsel" class="right-image" style="height:320px;width:auto;object-fit:contain;margin-top:15px;" />
+    <div class="wheel-area">
+      <div class="wheel-container">
+        <!-- Gösterge Ok -->
+        <svg class="arrow" viewBox="0 0 40 40">
+          <polygon points="20,0 35,30 5,30" fill="#EB1933" stroke="#000" stroke-width="2"/>
+        </svg>
+        <!-- Çark SVG -->
+        <div id="wheel-svg-wrapper" style="transition: transform 4s cubic-bezier(0.33, 1, 0.68, 1); will-change: transform;">
+          <svg id="wheel-svg" width="220" height="240" viewBox="0 0 240 240">
+            <!-- 6 dilim örneği, renkler Doritos ve Pepsi paletinden -->
+            <g>
+              <path d="M120,120 L120,10 A110,110 0 0,1 217,60 Z" fill="#FFF44F"/>
+              <path d="M120,120 L217,60 A110,110 0 0,1 217,180 Z" fill="#B22222"/>
+              <path d="M120,120 L217,180 A110,110 0 0,1 120,230 Z" fill="#A7C7E7"/>
+              <path d="M120,120 L120,230 A110,110 0 0,1 23,180 Z" fill="#001F3F"/>
+              <path d="M120,120 L23,180 A110,110 0 0,1 23,60 Z" fill="#F5F5DC"/>
+              <path d="M120,120 L23,60 A110,110 0 0,1 120,10 Z" fill="#77DD77"/>
+              <!-- Dilim ayırıcı çizgiler -->
+              <line x1="120" y1="120" x2="120" y2="10" stroke="#fff" stroke-width="3" />
+              <line x1="120" y1="120" x2="217" y2="60" stroke="#fff" stroke-width="3" />
+              <line x1="120" y1="120" x2="217" y2="180" stroke="#fff" stroke-width="3" />
+              <line x1="120" y1="120" x2="120" y2="230" stroke="#fff" stroke-width="3" />
+              <line x1="120" y1="120" x2="23" y2="180" stroke="#fff" stroke-width="3" />
+              <line x1="120" y1="120" x2="23" y2="60" stroke="#fff" stroke-width="3" />
+            </g>
+            <!-- Doritos cips görselleri -->
+            <image href="images/cipsler/flaminhot.png" x="135" y="33" width="48" height="48"/>
+            <image href="images/cipsler/Taco.png" x="186" y="93" width="48" height="48"/>
+            <image href="images/cipsler/Nacho.png" x="135" y="163" width="48" height="48"/>
+            <image href="images/cipsler/Extreme.png" x="60" y="163" width="48" height="48"/>
+            <image href="images/cipsler/Turca.png" x="20" y="93" width="48" height="48"/>
+            <image href="images/cipsler/Hotcorn.png" x="60" y="33" width="48" height="48"/>
+          </svg>
+        </div>
+      </div>
+      <div class="spin-btn-wrapper">
+        <button class="spin-btn" id="spin-btn">Çarkı Çevir</button>
+      </div>
+    </div>
+  </div>
+  <div class="wheel-message" style="position:absolute;left:450px;top:calc(50% - 138px);transform:translateY(-50%);width:220px;z-index:20;text-align:left;pointer-events:none;">
+    <span style="font-family:'Futura Bold', Arial, sans-serif;font-size:20px;color:#ffffff;font-weight:bold;letter-spacing:0.5px;line-height:1.35;display:block;">
+      Çarkı çevir,<br>
+      <span style="font-size:28px;display:block;">PEPSİ'ne</span>
+      eşlikçini bul!
+    </span>
+  </div>
+  <script src="main.js"></script>
+</body>
+</html> 

@@ -4,6 +4,13 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://oqwlelnvdrproefwrowm.supabase.co'
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9xd2xlbG52ZHJwcm9lZndyb3dtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4OTg4NjEsImV4cCI6MjA3MDQ3NDg2MX0.K0EK7ItF1Qh-4v8JahVtboc0YVUIgYnhMO7nXyP29wY'
 
+// Debug environment variables
+console.log('🌍 Environment check:', {
+  supabaseUrl: supabaseUrl,
+  hasAnonKey: !!supabaseAnonKey,
+  anonKeyPrefix: supabaseAnonKey.substring(0, 20) + '...'
+});
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // Auth helper functions

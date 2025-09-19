@@ -2,8 +2,10 @@ import { supabaseAuth } from '@/lib/supabase';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
+  console.log('🔐 Login attempt started');
   try {
     const { email, password } = await req.json();
+    console.log('📧 Login email:', email);
 
     if (!email || !password) {
       return NextResponse.json({ 
@@ -13,8 +15,10 @@ export async function POST(req: NextRequest) {
     }
 
     const { data, error } = await supabaseAuth.signIn(email, password);
+    console.log('🔑 Supabase auth result:', { success: !error, error: error?.message });
 
     if (error) {
+      console.log('❌ Login failed:', error.message);
       return NextResponse.json({ 
         success: false, 
         message: error.message 

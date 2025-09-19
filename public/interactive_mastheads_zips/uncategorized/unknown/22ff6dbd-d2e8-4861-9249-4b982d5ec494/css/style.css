@@ -1,0 +1,363 @@
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  background-color: #f0f0f0;
+}
+.masthead {
+  width: 970px;
+  height: 250px;
+  background: linear-gradient(to right, white 210px, #f0f000 210px);
+  border-radius: 0;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  position: relative;
+  overflow: hidden;
+}
+.logo-baloncuk-kapsayici {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 210px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+.logo-baloncuk-kapsayici-inner {
+  position: relative;
+  width: 150px;
+  height: 150px;
+}
+.logo-baloncuk-kapsayici #fairy-logo,
+.logo-baloncuk-kapsayici .baloncuk-resim {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 150px;
+  height: 150px;
+  transition: transform 0.6s, opacity 0.4s;
+  backface-visibility: hidden;
+}
+.logo-baloncuk-kapsayici #fairy-logo {
+  opacity: 1;
+  z-index: 2;
+  transform: rotateY(0deg);
+}
+.logo-baloncuk-kapsayici:hover #fairy-logo {
+  opacity: 0;
+  transform: rotateY(180deg);
+}
+.logo-baloncuk-kapsayici .baloncuk-resim {
+  opacity: 0;
+  z-index: 1;
+  transform: rotateY(-180deg);
+}
+.logo-baloncuk-kapsayici:hover .baloncuk-resim {
+  opacity: 1;
+  transform: rotateY(0deg);
+}
+.tabak-alani {
+  position: relative;
+  left: 180px;
+  top: 10%;
+  transform: translateY(-10%);
+  width: 300px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#temiz-tabak, #kirli-canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 300px;
+  height: 200px;
+}
+#sunger {
+  position: absolute;
+  right: -10px;
+  bottom: 20px;
+  margin: 0;
+  width: 60px;
+  height: 40px;
+  z-index: 3;
+  cursor: grab;
+  user-select: none;
+  transition: box-shadow 0.2s;
+}
+#sunger.dragging {
+  cursor: grabbing;
+  opacity: 1;
+  filter: none;
+  box-shadow: none;
+}
+#sunger.drag-off, .sunger-efekt.drag-off {
+  box-shadow: none !important;
+  opacity: 0.7;
+}
+#sunger.bounce {
+  animation: sungerBounce 0.7s infinite alternate cubic-bezier(.4,0,.2,1);
+}
+@keyframes sungerBounce {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.18); }
+}
+.sabun-alani {
+  position: relative;
+  width: 400px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  right: -80px;
+}
+
+.sabun-link {
+  text-decoration: none;
+  position: absolute;
+  right: 0;
+  top: 20px; /* Moved 20px down */
+  height: 100%;
+  width: 400px;
+  margin-right: -55px; /* Moved 15px right */
+}
+
+.sabun {
+  cursor: pointer;
+  position: absolute;
+  width: 140px; /* Increased size */
+  transition: transform 0.2s;
+}
+.sabun:hover {
+  transform: scale(1.08);
+}
+#sabun1 {
+  width: 160px; /* Slightly larger */
+  z-index: 10;
+  bottom: 30px;
+}
+#sabun2 {
+  z-index: 9;
+  left: 80px; /* Moved closer to touch */
+  bottom: 20px;
+}
+#sabun3 {
+  z-index: 9;
+  right: 80px; /* Moved closer to touch */
+  bottom: 20px;
+}
+
+/* Text Styles from Image */
+.metin-alani {
+  position: absolute;
+  left: 180px;
+  top: 45px;
+  font-family: 'Montserrat', sans-serif;
+  color: #006400; /* Dark Green */
+}
+
+.baslik {
+  font-size: 28px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.slogan {
+  font-size: 16px;
+  margin: 10px 0 0 0;
+  line-height: 1.4;
+  font-weight: bold;
+}
+
+.sunger-ipuclari {
+  position: absolute;
+  bottom: -55px;
+  right: -80px; /* 20px daha sola kaydırıldı */
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 12px;
+  color: #006400;
+  font-weight: bold;
+  width: 150px;
+}
+
+.sunger-ipuclari .ok,
+.sunger-ipuclari .ok::after {
+  display: none !important;
+}
+
+.sunger-efekt {
+  position: absolute;
+  right: -55px;
+  bottom: -15px;
+  margin: 8px 0 0 80px;
+  max-width: 140px;
+  font-size: 0.85rem;
+  color: #006400;
+  font-weight: bold;
+  text-align: left;
+  text-shadow: 0 0 8px #fff700, 0 0 16px #fffde4;
+  transition: box-shadow 0.3s, text-shadow 0.3s, opacity 0.3s;
+  line-height: 1.1;
+  white-space: normal;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  opacity: 0.95;
+}
+
+.sunger-efekt.blink {
+  animation: sungerBlink 0.8s infinite alternate;
+}
+@keyframes sungerBlink {
+  0% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+
+.isik-huzmesi {
+  position: absolute;
+  top: 50%;
+  left: calc(50% + 30px);
+  width: 350px;
+  height: 350px;
+  border-radius: 50%;
+  z-index: 8; /* Sabunların arkasında */
+  transform: translate(-50%, -50%);
+  background-image: 
+    /* Dönen ışık hüzmeleri */
+    conic-gradient(
+      from 0deg,
+      rgba(255, 255, 255, 0.9),      /* Beyaz */
+      rgba(240, 240, 0, 0.8),     /* Sarı (#f0f000) */
+      rgba(173, 255, 47, 0.7),      /* Açık Yeşil */
+      rgba(60, 179, 113, 0.8),      /* Orta Yeşil */
+      rgba(255, 255, 255, 0.9)       /* Tekrar Beyaz */
+    ),
+    /* Sabun köpüğü parıltıları ve bokeh efekti */
+    radial-gradient(circle at 15% 15%, rgba(255, 255, 255, 0.5) 0%, transparent 10%),
+    radial-gradient(circle at 85% 85%, rgba(255, 255, 224, 0.4) 0%, transparent 12%),
+    radial-gradient(circle at 50% 90%, rgba(144, 238, 144, 0.3) 0%, transparent 15%);
+  background-blend-mode: screen;
+  animation: spin 5s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+.video-alani {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 32%;
+  height: 100%;
+  background: rgba(255,255,255,0.98);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  box-shadow: -4px 0 16px rgba(0,0,0,0.08);
+}
+.video-alani iframe {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  border-radius: 0;
+  box-shadow: 0 2px 12px rgba(44,62,80,0.10);
+  background: #000;
+}
+.video-kapat {
+  position: absolute;
+  top: 12px;
+  right: 18px;
+  background: #fff;
+  border: none;
+  font-size: 2rem;
+  color: #333;
+  cursor: pointer;
+  z-index: 101;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  line-height: 36px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(44,62,80,0.08);
+  transition: background 0.2s;
+}
+.video-kapat:hover {
+  background: #ffe082;
+}
+
+.israf-mesaj {
+  font-family: 'Montserrat', sans-serif;
+  color: #006400;
+  font-size: 1.1rem;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 18px;
+}
+
+.etkili-mesaj {
+  position: absolute;
+  left: 218px;
+  top: 11px;
+  font-family: 'Montserrat', sans-serif;
+  color: #006400;
+  font-size: 26px;
+  font-weight: bold;
+  line-height: 1.1;
+  z-index: 20;
+  text-shadow: 0 2px 8px #fffde4;
+}
+.aciklama-mesaj {
+  position: absolute;
+  right: 40px;
+  bottom: 14px;
+  font-family: 'Montserrat', sans-serif;
+  color: #006400;
+  font-size: 9px;
+  font-weight: 500;
+  text-align: right;
+  z-index: 20;
+  line-height: 1.2;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s;
+}
+.aciklama-mesaj.goster {
+  opacity: 0.8;
+  pointer-events: auto;
+}
+.aciklama-kucuk {
+  font-size: 2px;
+  color: #006400;
+  font-size: 6px;
+  font-style: italic;
+}
+
+.etkili-mesaj, .aciklama-mesaj, .aciklama-kucuk, .sunger-efekt, .israf-mesaj, .slogan, .baslik {
+  font-family: 'Montserrat', sans-serif !important;
+  font-weight: bold !important;
+  color: #006400 !important;
+}
+.aciklama-kucuk {
+  font-style: italic;
+}
+
+

@@ -1,0 +1,177 @@
+/* Masthead ve genel stiller */
+body {
+  margin: 0;
+  padding: 0;
+  background: #fff;
+  overflow: hidden;
+}
+.masthead {
+  width: 970px;
+  height: 250px;
+  position: relative;
+  background: linear-gradient(315deg, #3d87cc 60%, #0e3270 100%);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 40px auto;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+.left-panel {
+  width: 200px;
+  height: 100%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+}
+.birlikte-logo {
+  position: relative;
+  width: 200px;
+  left:-5px;
+  height: auto;
+  z-index: 10;
+  pointer-events: none;
+  display: block;
+  top: -20px;
+}
+.wheel-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  width: 200px;
+  margin-left: 250px;
+  margin-top: -35px;
+  left: 20px;
+}
+.wheel-container {
+  position: relative;
+  width: 150px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  cursor: pointer;
+  left: 20px;
+}
+.arrow {
+  position: absolute;
+  left: -55px;
+  top: 50%;
+  transform: translateY(-50%) rotate(-270deg);
+  width: 40px;
+  height: 40px;
+  z-index: 2;
+}
+.spin-btn-wrapper {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 120px;
+  display: flex;
+  justify-content: center;
+  z-index: 10;
+  opacity: 1;
+  left: 50px;
+}
+.spin-btn {
+  background: #EB1933;
+  color: #fff;
+  font-family: Impact, 'Cooper Black', Arial, sans-serif;
+  font-size: 18px;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 24px;
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18), 0 0 0 4px rgba(235,25,51,0.08);
+  transition: background 0.2s, transform 0.2s;
+  animation: pulse 1.2s infinite;
+}
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.13); }
+  100% { transform: scale(1); }
+}
+.spin-btn:hover {
+  background: #b80f24;
+  transform: scale(1.15);
+}
+.right-image {
+  position: absolute;
+  right: 0px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 250px;
+  height: auto;
+  z-index: 999;
+  pointer-events: none;
+  display: block;
+  background: transparent !important;
+}
+.logo-img {
+  height: 100px;
+  width: auto;
+  display: block;
+}
+.pepsi-sise-logo {
+  width: 80px;
+  height: auto;
+  margin-left: 60px;
+  margin-top: -10px;
+  display: block;
+}
+.wheel-message {
+  position: absolute;
+  left: 418px;
+  top: calc(50% - 160px);
+  transform: translateY(-50%);
+  width: 220px;
+  z-index: 20;
+  text-align: left;
+  pointer-events: none;
+}
+.wheel-message span {
+  font-family: 'Futura Bold', Arial, sans-serif;
+  font-size: 20px;
+  color: #fff;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  line-height: 1.35;
+  display: block;
+}
+.wheel-message .big {
+  font-size: 28px;
+  display: block;
+}
+.blur-cips-svg {
+  filter: blur(3px) brightness(0.8);
+  transition: filter 0.4s;
+}
+.slide-to-arrow {
+  transition: transform 1s cubic-bezier(0.33,1,0.68,1);
+  transform: translate(-120px, 60px) scale(1.1);
+  z-index: 2000;
+}
+.slide-cips-to-arrow {
+  transition: transform 1s cubic-bezier(0.33,1,0.68,1);
+  transform: translate(-60px, 60px) scale(0.9);
+  z-index: 2000;
+}
+@media (max-width: 900px) {
+  .logo-img {
+    max-width: 22vw;
+  }
+  .pepsi-sise-logo {
+    max-height: 12vh;
+  }
+  .wheel-message {
+    left: 10vw;
+    top: 8vh;
+    width: 40vw;
+  }
+} 

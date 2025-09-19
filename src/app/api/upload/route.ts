@@ -67,6 +67,15 @@ async function uploadHandler(request: NextRequest) {
 
     if (uploadError) {
       console.error('❌ Supabase upload error:', uploadError);
+      
+      // Handle specific RLS error
+      if (uploadError.message.includes('row-level security policy')) {
+        return NextResponse.json({ 
+          success: false, 
+          error: 'Storage permission denied. Please check RLS policies.' 
+        }, { status: 403 });
+      }
+      
       return NextResponse.json({ 
         success: false, 
         error: `Upload failed: ${uploadError.message}` 

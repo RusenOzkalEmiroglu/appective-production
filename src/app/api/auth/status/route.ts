@@ -1,4 +1,4 @@
-import { supabaseAuth } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest) {
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     }
 
     const token = authHeader.substring(7);
-    const { data: { user }, error } = await supabaseAuth.getUserWithToken(token);
+    const { data: { user }, error } = await supabase.auth.getUser(token);
 
     if (error || !user) {
       console.error('Auth status error:', error);

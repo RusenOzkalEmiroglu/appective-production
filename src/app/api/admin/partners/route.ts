@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase, supabaseAuth } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 
 // Helper function to verify admin authentication
 async function verifyAdmin(request: NextRequest) {
@@ -12,7 +12,7 @@ async function verifyAdmin(request: NextRequest) {
   const token = authHeader.substring(7);
   
   try {
-    const { data: { user }, error } = await supabaseAuth.getUserWithToken(token);
+    const { data: { user }, error } = await supabase.auth.getUser(token);
     
     if (error || !user) {
       console.error('User verification failed:', error);

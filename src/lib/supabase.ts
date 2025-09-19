@@ -6,17 +6,6 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOi
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
-// Create server-side client with auth token
-export const createServerSupabaseClient = (authToken: string) => {
-  return createClient(supabaseUrl, supabaseAnonKey, {
-    global: {
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-      },
-    },
-  })
-}
-
 // Auth helper functions
 export const supabaseAuth = {
   signIn: async (email: string, password: string) => {
@@ -32,8 +21,12 @@ export const supabaseAuth = {
   },
   
   getUserWithToken: async (token: string) => {
-    const serverClient = createServerSupabaseClient(token)
-    return await serverClient.auth.getUser()
+    try {
+      const { data, error } = await supabase.auth.getUser(token)
+      return { data, error }
+    } catch (error) {
+      return { data: { user: null }, error }
+    }
   },
   
   getSession: async () => {

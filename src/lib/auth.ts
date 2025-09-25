@@ -97,29 +97,89 @@ export const auth = {
   },
 };
 
-// Authenticated fetch utility for admin API calls
-export const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
-  const token = localStorage.getItem('supabase_auth_token');
+// Refresh token utility
+const refreshAuthToken = async (): Promise<boolean> => {
+  try {
+    const refreshToken = localStorage.getItem('supabase_refresh_token');
+    if (!refreshToken) {
+      console.log('No refresh token available');
+      return false;
+    }
 
-  const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
+    console.log('Attempting to refresh token...');
+    const { data, error } = await supabase.auth.refreshSession({
+      refresh_token: refreshToken
+    });
 
-  const baseHeaders: Record<string, string> = {
-    ...(options.headers as Record<string, string>),
+    if (error || !data.session) {
+      console.error('Token refresh failed:', error);
+      auth.clearSession();
+      return false;
+    }
+
+    // Save new tokens
+    console.log('Token refreshed successfully');
+    localStorage.setItem('supabase_auth_token', data.session.access_token);
+    if (data.session.refresh_token) {
+      localStorage.setItem('supabase_refresh_token', data.session.refresh_token);
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Token refresh error:', error);
+    auth.clearSession();
+    return false;
+  }
+};
+
+// Authenticated fetch utility for admin API calls with auto token refresh
+export const fetchWithAuth = async (url: string, options: RequestInit = {}): Promise<Response> => {
+  const makeRequest = (token: string | null) => {
+    const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
+
+    const baseHeaders: Record<string, string> = {
+      ...(options.headers as Record<string, string>),
+    };
+
+    // Only set JSON content-type when NOT sending FormData
+    if (!isFormData && !('Content-Type' in baseHeaders)) {
+      baseHeaders['Content-Type'] = 'application/json';
+    }
+
+    if (token) {
+      baseHeaders['Authorization'] = `Bearer ${token}`;
+    }
+
+    return fetch(url, {
+      ...options,
+      headers: baseHeaders,
+    });
   };
 
-  // Only set JSON content-type when NOT sending FormData
-  if (!isFormData && !('Content-Type' in baseHeaders)) {
-    baseHeaders['Content-Type'] = 'application/json';
+  // First attempt with current token
+  let token = localStorage.getItem('supabase_auth_token');
+  let response = await makeRequest(token);
+
+  // If we get 401, try to refresh token and retry once
+  if (response.status === 401 && token) {
+    console.log('Got 401, attempting token refresh...');
+    const refreshSuccess = await refreshAuthToken();
+    
+    if (refreshSuccess) {
+      // Retry with new token
+      token = localStorage.getItem('supabase_auth_token');
+      response = await makeRequest(token);
+      console.log('Retry after refresh:', response.status);
+    } else {
+      console.log('Token refresh failed, redirecting to login');
+      // Redirect to admin login if we're in admin context
+      if (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin')) {
+        window.location.href = '/admin';
+      }
+    }
   }
 
-  if (token) {
-    baseHeaders['Authorization'] = `Bearer ${token}`;
-  }
-
-  return fetch(url, {
-    ...options,
-    headers: baseHeaders,
-  });
+  return response;
 };
 
 // Hook for React components

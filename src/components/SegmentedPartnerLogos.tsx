@@ -63,23 +63,36 @@ const SegmentedPartnerLogos = () => {
       setIsLoading(true);
       setError(null);
       try {
+        console.log('🔍 Fetching partners from /api/partners...');
         const response = await fetch('/api/partners');
         if (!response.ok) {
           throw new Error(`Failed to fetch partners: ${response.statusText}`);
         }
         const data: PartnerCategory[] = await response.json();
+        console.log('📊 Partners API Response:', data);
+        
+        // Log automotive category specifically
+        const automotiveCategory = data.find(cat => cat.id === '1');
+        console.log('🚗 Automotive Category:', automotiveCategory);
+        if (automotiveCategory) {
+          console.log('🚗 Automotive Logos:', automotiveCategory.logos);
+        }
+        
         setCategoriesData(data);
         // Set the first available category as the default selected category
         const firstCatWithLogos = data.find(cat => cat.logos.length > 0 && cat.id !== 'interactive_masthead');
+        console.log('🎯 First category with logos:', firstCatWithLogos);
         if (firstCatWithLogos) {
           setSelectedCategory(firstCatWithLogos.id);
+          console.log('✅ Selected category:', firstCatWithLogos.id);
         } else if (data.length > 0) {
           // Find first category with logos or fallback to first category
           const categoryWithLogos = data.find(cat => cat.logos.length > 0);
           setSelectedCategory(categoryWithLogos ? categoryWithLogos.id : data[0].id);
+          console.log('✅ Fallback selected category:', categoryWithLogos ? categoryWithLogos.id : data[0].id);
         }
       } catch (err: any) {
-        console.error("Error fetching partners:", err);
+        console.error("❌ Error fetching partners:", err);
         setError(err.message || 'An unknown error occurred');
       }
       setIsLoading(false);
@@ -94,6 +107,11 @@ const SegmentedPartnerLogos = () => {
     // imagePath from API is already correct, e.g., /images/is_ortaklari/category/logo.svg
     // src for Image component should be this imagePath directly
   })) || [];
+
+  // Debug logging for displayed logos
+  console.log('🎨 Current selected category:', selectedCategory);
+  console.log('🎨 Current category data:', currentCategory);
+  console.log('🎨 Displayed logos:', displayedLogos);
 
   // Exclude 'interactive_masthead' from filter buttons, and categories with no logos
   const filterButtonsData = categoriesData.filter(cat => cat.logos.length > 0 && cat.id !== 'interactive_masthead');

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, FC, ReactNode, useCallback } from 'react';
 import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
+import { fetchWithAuth } from '@/lib/auth';
 
 // --- Reusable Confirmation Modal Component --- //
 interface ConfirmationModalProps {
@@ -131,7 +132,7 @@ const AdminTopBannerManagement: FC = () => {
           formData.append('file', newImage);
           
           try {
-            const uploadResponse = await fetch('/api/upload-banner', {
+            const uploadResponse = await fetchWithAuth('/api/upload-banner', {
               method: 'POST',
               body: formData,
             });
@@ -143,8 +144,10 @@ const AdminTopBannerManagement: FC = () => {
               throw new Error('Resim yükleme başarısız');
             }
           } catch (uploadError) {
-            // API yoksa, basit yol kullan
-            imageUrl = `/images/banner/${newImage.name}`;
+            showFeedback('error', 'Resim yükleme başarısız. Lütfen yeniden deneyin.');
+            setIsActionInProgress(false);
+            setIsModalOpen(false);
+            return;
           }
         }
 

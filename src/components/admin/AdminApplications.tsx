@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { fetchWithAuth } from '@/lib/auth';
 import { ApplicationItem } from '@/data/types';
 import { buttonStyles } from '@/app/utils/constants';
 
@@ -74,10 +75,9 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ item, onSave, onCance
       const formDataForUpload = new FormData();
       formDataForUpload.append('file', imageFile);
       try {
-        const response = await fetch('/api/upload', { 
+        const response = await fetchWithAuth('/api/upload', { 
           method: 'POST', 
-          body: formDataForUpload,
-          credentials: 'include'
+          body: formDataForUpload
         });
         if (!response.ok) throw new Error('Image upload failed');
         const result = await response.json();
@@ -100,13 +100,11 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({ item, onSave, onCance
     const method = item?.id ? 'PUT' : 'POST';
 
     try {
-      const response = await fetch(endpoint, {
+      const response = await fetchWithAuth(endpoint, {
         method,
         headers: { 
-          'Content-Type': 'application/json',
-          'Cookie': document.cookie
+          'Content-Type': 'application/json'
         },
-        credentials: 'include',
         body: JSON.stringify(finalData),
       });
 
@@ -190,7 +188,7 @@ export default function AdminApplications() {
   const fetchApplications = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/applications');
+      const response = await fetchWithAuth('/api/applications');
       if (!response.ok) throw new Error('Failed to fetch applications');
       const data = await response.json();
       setApplications(Array.isArray(data) ? data : []);
@@ -225,9 +223,8 @@ export default function AdminApplications() {
     if (!applicationToDelete) return;
 
     try {
-      const response = await fetch(`/api/applications?id=${applicationToDelete.id}`, { 
-        method: 'DELETE',
-        credentials: 'include'
+      const response = await fetchWithAuth(`/api/applications?id=${applicationToDelete.id}`, { 
+        method: 'DELETE'
       });
       if (!response.ok) throw new Error('Failed to delete');
       setApplications(prev => prev.filter(p => p.id !== applicationToDelete.id));

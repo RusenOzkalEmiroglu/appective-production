@@ -5,6 +5,7 @@ import fs from 'fs/promises';
 import { JobApplication } from '@/types/jobApplication';
 import { withAdminAuthSimple } from '@/lib/withAdminAuth';
 import { supabase } from '@/lib/supabase';
+import { assertSupabaseAdmin } from '@/lib/supabaseAdmin';
 
 // --- Configuration ---
 const allowedFileTypes = [
@@ -49,8 +50,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Dosya boyutu 5MB\'dan küçük olmalıdır.' }, { status: 400 });
     }
 
-    // Check existing applications from Supabase
-    const { data: existingApps, error: checkError } = await supabase
+    // Check existing applications from Supabase (using admin client to bypass RLS)
+    const admin = assertSupabaseAdmin();
+    const { data: existingApps, error: checkError } = await admin
       .from('job_applications')
       .select('*')
       .eq('email', email)
@@ -71,9 +73,9 @@ export async function POST(request: NextRequest) {
     const fileBuffer = Buffer.from(await cvFile.arrayBuffer());
     await fs.writeFile(filePath, fileBuffer);
 
-    // Save application to Supabase
+    // Save application to Supabase (using admin client to bypass RLS)
     const applicationId = uuidv4();
-    const { data: newApplication, error: insertError } = await supabase
+    const { data: newApplication, error: insertError } = await admin
       .from('job_applications')
       .insert({
         id: applicationId,

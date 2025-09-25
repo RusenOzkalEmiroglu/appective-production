@@ -100,19 +100,25 @@ export const auth = {
 // Authenticated fetch utility for admin API calls
 export const fetchWithAuth = async (url: string, options: RequestInit = {}) => {
   const token = localStorage.getItem('supabase_auth_token');
-  
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
+
+  const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
+
+  const baseHeaders: Record<string, string> = {
     ...(options.headers as Record<string, string>),
   };
 
+  // Only set JSON content-type when NOT sending FormData
+  if (!isFormData && !('Content-Type' in baseHeaders)) {
+    baseHeaders['Content-Type'] = 'application/json';
+  }
+
   if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+    baseHeaders['Authorization'] = `Bearer ${token}`;
   }
 
   return fetch(url, {
     ...options,
-    headers,
+    headers: baseHeaders,
   });
 };
 

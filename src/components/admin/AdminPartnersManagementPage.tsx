@@ -4,7 +4,7 @@ import React, { useState, useEffect, FormEvent } from 'react';
 import { PartnerCategory, LogoInfo } from '@/lib/partnersDataUtils'; // Assuming types are exported
 import { PlusCircle, Edit3, Trash2, ChevronDown, ChevronRight, ImageUp, Loader2, Check, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import { useAuth } from '@/lib/auth';
+import { useAuth, fetchWithAuth } from '@/lib/auth';
 
 const AdminPartnersManagementPage = () => {
   const { getSavedSession } = useAuth();
@@ -318,13 +318,11 @@ const AdminPartnersManagementPage = () => {
         url: newLogoClickUrl.trim() || null
       });
 
-      // Use admin API with authentication token
-      const session = getSavedSession();
-      const response = await fetch('/api/admin/partners', {
+      // Use admin API with authenticated helper (adds Authorization automatically)
+      const response = await fetchWithAuth('/api/admin/partners', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.access_token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           category_id: parseInt(categoryId),

@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { JobOpening } from '@/lib/supabase';
 import { supabase } from '@/lib/supabase';
+import { assertSupabaseAdmin } from '@/lib/supabaseAdmin';
 import { withAdminAuthSimple } from '@/lib/withAdminAuth';
 
 // Supabase'den job openings verilerini al
@@ -55,7 +56,9 @@ async function postHandler(request: NextRequest) {
       id: generateId(),
     };
     
-    const { data, error } = await supabase
+    // Use admin client for mutations to bypass RLS safely (endpoint is auth-protected)
+    const admin = assertSupabaseAdmin();
+    const { data, error } = await admin
       .from('job_openings')
       .insert([jobWithId])
       .select()
@@ -75,3 +78,61 @@ async function postHandler(request: NextRequest) {
 
 // Wrap the protected handler with authentication. This is a static route, so we use `withAdminAuthSimple`.
 export const POST = withAdminAuthSimple(postHandler);
+
+// PUT handler to update a job opening (protected)
+async function putHandler(request: NextRequest) {
+  try {
+    const updatedJob = await request.json();
+    if (!updatedJob.id) {
+      return NextResponse.json({ message: 'Job ID is required' }, { status: 400 });
+    }
+
+    const admin = assertSupabaseAdmin();
+    const { data, error } = await admin
+      .from('job_openings')
+      .update(updatedJob)
+      .eq('id', updatedJob.id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Supabase update error:', error);
+      return NextResponse.json({ message: 'Error updating job opening' }, { status: 500 });
+    }
+
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error('Failed to update job opening:', error);
+    return NextResponse.json({ message: 'Error updating job opening' }, { status: 500 });
+  }
+}
+
+// DELETE handler to remove a job opening (protected)
+async function deleteHandler(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+    if (!id) {
+      return NextResponse.json({ message: 'Job ID is required' }, { status: 400 });
+    }
+
+    const admin = assertSupabaseAdmin();
+    const { error } = await admin
+      .from('job_openings')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Supabase delete error:', error);
+      return NextResponse.json({ message: 'Error deleting job opening' }, { status: 500 });
+    }
+
+    return NextResponse.json({ message: 'Job opening deleted successfully' }, { status: 200 });
+  } catch (error) {
+    console.error('Failed to delete job opening:', error);
+    return NextResponse.json({ message: 'Error deleting job opening' }, { status: 500 });
+  }
+}
+
+export const PUT = withAdminAuthSimple(putHandler);
+export const DELETE = withAdminAuthSimple(deleteHandler);

@@ -103,7 +103,16 @@ const ServiceForm: React.FC<ServiceFormProps> = ({ initialData, onSubmit, onCanc
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      onSubmit(formData);
+      // Map frontend fields to backend fields
+      const backendData = {
+        id: formData.id,
+        name: formData.name,
+        description: formData.description,
+        folder_name: formData.folderName,
+        icon: formData.icon || '',
+        image_url: formData.imageUrl || ''
+      };
+      onSubmit(backendData as any);
     }
   };
 

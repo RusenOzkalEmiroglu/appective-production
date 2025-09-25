@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { JobApplication } from '@/types/jobApplication';
 import { withAdminAuth } from '@/lib/withAdminAuth';
 import { supabase } from '@/lib/supabase';
+import { assertSupabaseAdmin } from '@/lib/supabaseAdmin';
 
 // --- Helper Functions ---
 // Bu fonksiyonlar artık gerekli değil, Supabase direkt kullanılacak
@@ -46,23 +47,25 @@ async function getHandler(request: NextRequest, { params }: { params: { id: stri
 // Original PATCH handler logic
 async function patchHandler(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const { status } = await request.json();
-    if (!['pending', 'reviewed', 'rejected'].includes(status)) {
+    const body = await request.json();
+    const status = body?.status as string;
+
+    const allowed = ['pending', 'reviewed', 'rejected', 'contacted'];
+    if (!status || !allowed.includes(status)) {
       return NextResponse.json({ error: 'Geçersiz durum değeri.' }, { status: 400 });
     }
 
-    const { data, error } = await supabase
+    const admin = assertSupabaseAdmin();
+    const { data, error } = await admin
       .from('job_applications')
-      .update({ 
-        status
-      })
+      .update({ status })
       .eq('id', params.id)
       .select()
       .single();
 
     if (error) {
       console.error('Supabase güncelleme hatası:', error);
-      return NextResponse.json({ error: 'Başvuru bulunamadı.' }, { status: 404 });
+      return NextResponse.json({ error: 'Başvuru bulunamadı veya güncellenemedi.' }, { status: 404 });
     }
 
     return NextResponse.json({ success: true, message: 'Başvuru durumu güncellendi.' }, { status: 200 });
@@ -75,7 +78,8 @@ async function patchHandler(request: NextRequest, { params }: { params: { id: st
 // Original DELETE handler logic
 async function deleteHandler(request: NextRequest, { params }: { params: { id: string } }) {
   try {
-    const { error } = await supabase
+    const admin = assertSupabaseAdmin();
+    const { error } = await admin
       .from('job_applications')
       .delete()
       .eq('id', params.id);

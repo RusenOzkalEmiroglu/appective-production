@@ -5,6 +5,7 @@ import React, { useState, useEffect, FormEvent } from 'react';
 import { JobOpening } from '@/lib/supabase';
 import { PlusCircle, Edit3, Trash2, ChevronDown, ChevronUp, Loader2, Check, X, AlertCircle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { fetchWithAuth } from '@/lib/auth';
 
 // Onay modalı component'i
 interface ConfirmModalProps {
@@ -57,12 +58,9 @@ const AdminJobOpeningsManagementPage = () => {
   const fetchJobOpenings = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('job_openings')
-        .select('*')
-        .order('id');
-      
-      if (error) throw error;
+      const response = await fetchWithAuth('/api/job-openings');
+      if (!response.ok) throw new Error('Failed to fetch job openings');
+      const data = await response.json();
       setJobOpenings(data || []);
     } catch (err: any) {
       setError(err.message || 'İş ilanları yüklenirken hata oluştu.');
@@ -85,12 +83,8 @@ const AdminJobOpeningsManagementPage = () => {
 
   const handleDeleteConfirm = async () => {
     try {
-      const { error } = await supabase
-        .from('job_openings')
-        .delete()
-        .eq('id', deleteModal.jobId);
-      
-      if (error) throw error;
+      const response = await fetchWithAuth(`/api/job-openings?id=${deleteModal.jobId}`, { method: 'DELETE' });
+      if (!response.ok) throw new Error('Failed to delete job opening');
       setJobOpenings(prev => prev.filter(job => job.id !== deleteModal.jobId));
       setDeleteModal({ isOpen: false, jobId: '', jobTitle: '' });
     } catch (err: any) {
@@ -253,31 +247,28 @@ const JobOpeningForm: React.FC<JobOpeningFormProps> = ({ job, onSuccess, onCance
 
         try {
             if (job) {
-                try {
-                    // Update existing job
-                    const { id, ...updateData } = submissionData; // Exclude ID from update data
-                    
-                    const { data, error } = await supabase
-                        .from('job_openings')
-                        .update(updateData)
-                        .eq('id', job.id)
-                        .select();
-                    
-                    console.log('Update result:', { data, error }); // Debug
-                    if (error) throw error;
-                } catch (err: any) {
-                    console.error('Update error:', err); // Debug
-                    throw err;
+                // Update existing job through protected API
+                const { id, ...updateData } = submissionData;
+                const response = await fetchWithAuth('/api/job-openings', {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ id: job.id, ...updateData })
+                });
+                if (!response.ok) {
+                  const err = await response.json().catch(() => ({}));
+                  throw new Error(err.message || 'Failed to update job opening');
                 }
             } else {
-                // Insert new job with generated ID
-                const { data, error } = await supabase
-                    .from('job_openings')
-                    .insert([submissionData])
-                    .select();
-                
-                console.log('Insert result:', { data, error }); // Debug
-                if (error) throw error;
+                // Insert new job through protected API
+                const response = await fetchWithAuth('/api/job-openings', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(submissionData)
+                });
+                if (!response.ok) {
+                  const err = await response.json().catch(() => ({}));
+                  throw new Error(err.message || 'Failed to create job opening');
+                }
             }
             
             onSuccess();

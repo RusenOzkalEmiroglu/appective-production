@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
+import { withAdminAuthSimple } from '@/lib/withAdminAuth';
 
-export async function POST(request: NextRequest) {
+async function postHandler(request: NextRequest) {
   try {
     const data = await request.formData();
     const file: File | null = data.get('file') as unknown as File;
@@ -53,3 +54,5 @@ export async function POST(request: NextRequest) {
     }, { status: 500 });
   }
 }
+
+export const POST = withAdminAuthSimple(postHandler);

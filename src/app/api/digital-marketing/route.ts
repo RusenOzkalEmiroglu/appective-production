@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { DigitalMarketingItem, initialDigitalMarketingItems } from '@/data/digitalMarketingData';
+import { withAdminAuthSimple } from '@/lib/withAdminAuth';
+import { assertSupabaseAdmin } from '@/lib/supabaseAdmin';
 
 export async function GET() {
   try {
@@ -22,19 +24,19 @@ export async function GET() {
   }
 }
 
-export async function POST(request: Request) {
+async function postHandler(request: Request) {
   try {
     const itemData = await request.json();
     
-    // Handle single item (not bulk update)
     if (!itemData.title || !itemData.client) {
       return NextResponse.json({ message: 'Title and client are required' }, { status: 400 });
     }
 
+    const admin = assertSupabaseAdmin();
+
     let result;
     if (itemData.id && itemData.id !== 0) {
-      // Update existing item
-      const { data, error } = await supabase
+      const { data, error } = await admin
         .from('digital_marketing')
         .update({
           title: itemData.title,
@@ -49,8 +51,7 @@ export async function POST(request: Request) {
       
       result = { data, error };
     } else {
-      // Insert new item
-      const { data, error } = await supabase
+      const { data, error } = await admin
         .from('digital_marketing')
         .insert({
           title: itemData.title,
@@ -77,7 +78,7 @@ export async function POST(request: Request) {
   }
 }
 
-export async function DELETE(request: Request) {
+async function deleteHandler(request: Request) {
   try {
     const url = new URL(request.url);
     const id = url.searchParams.get('id');
@@ -86,7 +87,9 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ message: 'ID is required' }, { status: 400 });
     }
 
-    const { error } = await supabase
+    const admin = assertSupabaseAdmin();
+
+    const { error } = await admin
       .from('digital_marketing')
       .delete()
       .eq('id', parseInt(id));
@@ -102,3 +105,6 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ message: 'Error deleting data', error: (error as Error).message }, { status: 500 });
   }
 }
+
+export const POST = withAdminAuthSimple(postHandler);
+export const DELETE = withAdminAuthSimple(deleteHandler);

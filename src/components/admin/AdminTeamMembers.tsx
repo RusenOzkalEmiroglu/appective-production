@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { TeamMember } from '@/lib/supabase';
 import ImageUploader from '@/components/admin/ImageUploader';
+import { fetchWithAuth } from '@/lib/auth';
 
 interface TeamMemberFormData {
   id?: number;
@@ -59,7 +60,7 @@ const AdminTeamMembers = () => {
     }
 
     try {
-      const response = await fetch('/api/team-members', {
+      const response = await fetchWithAuth('/api/team-members', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -101,7 +102,7 @@ const AdminTeamMembers = () => {
     if (!deletingItemId) return;
 
     try {
-      const response = await fetch(`/api/team-members?id=${deletingItemId}`, {
+      const response = await fetchWithAuth(`/api/team-members?id=${deletingItemId}`, {
         method: 'DELETE',
       });
 

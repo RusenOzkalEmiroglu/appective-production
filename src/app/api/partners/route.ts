@@ -3,11 +3,18 @@ import { supabase } from '@/lib/supabase';
 
 export async function GET() {
   try {
+    console.log('=== Partners API GET Start ===');
+    
     // Fetch categories
     const { data: categoriesData, error: categoriesError } = await supabase
       .from('partner_categories')
       .select('*')
       .order('id');
+    
+    console.log('Categories fetched:', {
+      count: categoriesData?.length || 0,
+      categories: categoriesData?.map(c => ({ id: c.id, name: c.name })) || []
+    });
     
     if (categoriesError) {
       console.error('Categories error:', categoriesError);
@@ -19,6 +26,11 @@ export async function GET() {
       .from('partner_logos')
       .select('*')
       .order('id');
+      
+    console.log('Logos fetched:', {
+      count: logosData?.length || 0,
+      logos: logosData?.map(l => ({ id: l.id, category_id: l.category_id, alt: l.alt })) || []
+    });
       
     if (logosError) {
       console.error('Logos error:', logosError);
@@ -39,6 +51,16 @@ export async function GET() {
           url: logo.url || undefined
         }))
     }));
+
+    console.log('Final response:', {
+      totalCategories: categoriesWithLogos.length,
+      categoriesWithLogos: categoriesWithLogos.map(c => ({ 
+        id: c.id, 
+        name: c.name, 
+        logoCount: c.logos.length 
+      }))
+    });
+    console.log('=== Partners API GET Success ===');
 
     return NextResponse.json(categoriesWithLogos);
 

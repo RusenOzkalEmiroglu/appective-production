@@ -62,7 +62,14 @@ export async function GET() {
     });
     console.log('=== Partners API GET Success ===');
 
-    return NextResponse.json(categoriesWithLogos);
+    const response = NextResponse.json(categoriesWithLogos);
+    
+    // Add cache control headers to ensure fresh data
+    response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+    
+    return response;
 
   } catch (error: any) {
     console.error('API error:', error);

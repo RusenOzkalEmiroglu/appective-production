@@ -63,7 +63,9 @@ const SegmentedPartnerLogos = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const response = await fetch('/api/partners');
+        // Add timestamp to bypass cache
+        const timestamp = new Date().getTime();
+        const response = await fetch(`/api/partners?t=${timestamp}`);
         if (!response.ok) {
           throw new Error(`Failed to fetch partners: ${response.statusText}`);
         }

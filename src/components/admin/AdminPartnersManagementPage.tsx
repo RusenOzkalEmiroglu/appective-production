@@ -102,17 +102,19 @@ const AdminPartnersManagementPage = () => {
     setIsAddingCategory(true);
     setError(null);
 
-    await setSupabaseSession();
-
     try {
-      const { error } = await supabase
-        .from('partner_categories')
-        .insert([{
+      const response = await fetchWithAuth('/api/partner-categories', {
+        method: 'POST',
+        body: JSON.stringify({
           name: newCategoryName,
           original_path: newCategoryOriginalPath
-        }]);
-      
-      if (error) throw error;
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Kategori eklenemedi');
+      }
       
       setNewCategoryName('');
       setNewCategoryOriginalPath('');
@@ -134,21 +136,14 @@ const AdminPartnersManagementPage = () => {
     setDeletingCategoryId(categoryToDelete.id);
     setError(null);
     try {
-      // First delete all logos in this category
-      const { error: logosError } = await supabase
-        .from('partner_logos')
-        .delete()
-        .eq('category_id', parseInt(categoryToDelete.id));
-      
-      if (logosError) throw logosError;
+      const response = await fetchWithAuth(`/api/partner-categories?id=${categoryToDelete.id}`, {
+        method: 'DELETE'
+      });
 
-      // Then delete the category
-      const { error: categoryError } = await supabase
-        .from('partner_categories')
-        .delete()
-        .eq('id', parseInt(categoryToDelete.id));
-      
-      if (categoryError) throw categoryError;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Kategori silinemedi');
+      }
       
       await fetchCategories(); // Refresh the list
     } catch (err: any) {
@@ -179,12 +174,18 @@ const AdminPartnersManagementPage = () => {
     setIsUpdatingCategory(true);
     setError(null);
     try {
-      const { error } = await supabase
-        .from('partner_categories')
-        .update({ name: editCategoryName })
-        .eq('id', parseInt(editingCategory.id));
-      
-      if (error) throw error;
+      const response = await fetchWithAuth(`/api/partner-categories?id=${editingCategory.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          name: editCategoryName,
+          original_path: editingCategory.originalPath
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Kategori güncellenemedi');
+      }
       
       await fetchCategories(); // Refresh the list
       handleCancelEdit(); // Exit edit mode

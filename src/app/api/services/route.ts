@@ -28,12 +28,35 @@ export async function GET() {
 // POST handler - add service to Supabase
 async function postHandler(request: NextRequest) {
   try {
+    console.log('=== Services POST Start ===');
+    
+    // Check environment variables first
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    console.log('Environment check:', {
+      hasServiceRoleKey: !!serviceRoleKey,
+      serviceRoleKeyPrefix: serviceRoleKey ? serviceRoleKey.substring(0, 20) + '...' : 'undefined'
+    });
+
+    if (!serviceRoleKey) {
+      console.error('SUPABASE_SERVICE_ROLE_KEY is not set in environment variables');
+      return NextResponse.json({ message: 'Server configuration error: Missing service key' }, { status: 500 });
+    }
+
     const newService = await request.json();
+    console.log('Service data received:', {
+      id: newService.id,
+      name: newService.name,
+      hasDescription: !!newService.description,
+      hasIcon: !!newService.icon,
+      hasImageUrl: !!newService.image_url
+    });
 
     if (!newService || typeof newService.name !== 'string' || !newService.name.trim()) {
+      console.log('Invalid service data - missing or invalid name');
       return NextResponse.json({ message: 'Invalid service data. Name is required.' }, { status: 400 });
     }
 
+    console.log('Inserting service to Supabase...');
     const admin = assertSupabaseAdmin();
     const { data, error } = await admin
       .from('services')
@@ -46,9 +69,14 @@ async function postHandler(request: NextRequest) {
       return NextResponse.json({ message: 'Failed to add service' }, { status: 500 });
     }
 
+    console.log('Service saved successfully:', data?.id);
+    console.log('=== Services POST Success ===');
     return NextResponse.json(data, { status: 201 });
   } catch (error) {
-    console.error('Error processing POST request for services:', error);
+    console.error('=== Services POST Error ===');
+    console.error('Full error details:', error);
+    console.error('Error message:', error instanceof Error ? error.message : 'Unknown error');
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json({ message: 'Error adding service', error: errorMessage }, { status: 500 });
   }

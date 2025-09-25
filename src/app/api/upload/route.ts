@@ -70,6 +70,15 @@ async function saveZipAndExtract(file: File, category: string, brand: string) {
 
 async function postHandler(request: NextRequest) {
   try {
+    console.log('=== Upload POST Start ===');
+    
+    // Check environment variables first
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    console.log('Environment check:', {
+      hasServiceRoleKey: !!serviceRoleKey,
+      serviceRoleKeyPrefix: serviceRoleKey ? serviceRoleKey.substring(0, 20) + '...' : 'undefined'
+    });
+
     const formData = await request.formData();
     const file = formData.get('file') as unknown as File | null;
     const categoryRaw = (formData.get('category') as string | null) || 'uncategorized';

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, FormEvent } from 'react';
 import { PartnerCategory, LogoInfo } from '@/lib/partnersDataUtils'; // Assuming types are exported
-import { PlusCircle, Edit3, Trash2, ChevronDown, ChevronRight, ImageUp, Loader2, Check, X } from 'lucide-react';
+import { PlusCircle, Edit3, Trash2, ChevronDown, ChevronRight, ImageUp, Loader2, Check, X, RefreshCw } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useAuth, fetchWithAuth } from '@/lib/auth';
 
@@ -423,7 +423,17 @@ const AdminPartnersManagementPage = () => {
       )}
 
       <div className="p-4 md:p-6 bg-gray-900 min-h-screen text-white">
-      <h1 className="text-3xl font-bold mb-8 text-purple-400">İş Ortakları Yönetimi</h1>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-purple-400">İş Ortakları Yönetimi</h1>
+        <button
+          onClick={fetchCategories}
+          disabled={isLoading}
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm bg-purple-600/20 hover:bg-purple-600/30 disabled:bg-gray-600/20 text-purple-300 rounded-lg transition-colors duration-200"
+        >
+          <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+          {isLoading ? 'Güncelleniyor...' : 'Verileri Yenile'}
+        </button>
+      </div>
 
       {error && (
         <div className="bg-red-700 border border-red-900 text-white px-4 py-3 rounded-md relative mb-6" role="alert">

@@ -6,6 +6,7 @@ import React from 'react'; // Import React for JSX
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
+import { RefreshCw } from 'lucide-react';
 import { PartnerCategory, LogoInfo as ApiLogoInfo } from '@/lib/partnersDataUtils'; // Assuming types are exported
 
 // We'll handle the animation manually without staggerChildren
@@ -57,37 +58,57 @@ const SegmentedPartnerLogos = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [lastRefresh, setLastRefresh] = useState<number>(0);
+
+  const fetchPartners = async (forceRefresh = false) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      // Add timestamp to bypass cache and force fresh data
+      const timestamp = new Date().getTime();
+      const response = await fetch(`/api/partners?t=${timestamp}&refresh=${forceRefresh ? '1' : '0'}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        }
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch partners: ${response.statusText}`);
+      }
+      const data: PartnerCategory[] = await response.json();
+      setCategoriesData(data);
+      setLastRefresh(timestamp);
+      
+      // Set the first available category as the default selected category
+      // Prefer categories with logos, but show any category if none have logos
+      const firstCatWithLogos = data.find(cat => cat.logos.length > 0 && cat.id !== 'interactive_masthead');
+      const firstCat = data.find(cat => cat.id !== 'interactive_masthead');
+      
+      if (firstCatWithLogos) {
+        setSelectedCategory(firstCatWithLogos.id);
+      } else if (firstCat) {
+        // If no categories have logos, select the first available category
+        setSelectedCategory(firstCat.id);
+      }
+    } catch (err: any) {
+      console.error("Error fetching partners:", err);
+      setError(err.message || 'An unknown error occurred');
+    }
+    setIsLoading(false);
+  };
 
   useEffect(() => {
-    const fetchPartners = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        // Add timestamp to bypass cache
-        const timestamp = new Date().getTime();
-        const response = await fetch(`/api/partners?t=${timestamp}`);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch partners: ${response.statusText}`);
-        }
-        const data: PartnerCategory[] = await response.json();
-        setCategoriesData(data);
-        // Set the first available category as the default selected category
-        const firstCatWithLogos = data.find(cat => cat.logos.length > 0 && cat.id !== 'interactive_masthead');
-        if (firstCatWithLogos) {
-          setSelectedCategory(firstCatWithLogos.id);
-        } else if (data.length > 0) {
-          // Find first category with logos or fallback to first category
-          const categoryWithLogos = data.find(cat => cat.logos.length > 0);
-          setSelectedCategory(categoryWithLogos ? categoryWithLogos.id : data[0].id);
-        }
-      } catch (err: any) {
-        console.error("Error fetching partners:", err);
-        setError(err.message || 'An unknown error occurred');
-      }
-      setIsLoading(false);
-    };
-
     fetchPartners();
+  }, []);
+
+  // Auto-refresh data every 30 seconds to catch updates
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchPartners(true);
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(interval);
   }, []);
 
   const currentCategory = categoriesData.find(cat => cat.id === selectedCategory);
@@ -98,8 +119,9 @@ const SegmentedPartnerLogos = () => {
   })) || [];
 
 
-  // Exclude 'interactive_masthead' from filter buttons, and categories with no logos
-  const filterButtonsData = categoriesData.filter(cat => cat.logos.length > 0 && cat.id !== 'interactive_masthead');
+  // Show all categories except 'interactive_masthead' (even if they have no logos)
+  // This ensures new categories appear immediately when added
+  const filterButtonsData = categoriesData.filter(cat => cat.id !== 'interactive_masthead');
 
   if (isLoading) {
     return (
@@ -129,13 +151,26 @@ const SegmentedPartnerLogos = () => {
   return (
     <div className="py-12 md:py-20 bg-gradient-to-br from-gray-900/[.15] via-purple-900/[.15] to-black/[.15] text-white">
       <div className="container mx-auto px-4">
-        <motion.h2 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center mb-10 md:mb-16 tracking-tight">
-          Our <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-orange-400">Partners</span>
-        </motion.h2>
+        <div className="text-center mb-10 md:mb-16">
+          <motion.h2 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight">
+            Our <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-orange-400">Partners</span>
+          </motion.h2>
+          <motion.button
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            onClick={() => fetchPartners(true)}
+            disabled={isLoading}
+            className="mt-4 inline-flex items-center gap-2 px-4 py-2 text-sm bg-purple-600/20 hover:bg-purple-600/30 disabled:bg-gray-600/20 text-purple-300 rounded-lg transition-colors duration-200"
+          >
+            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+            {isLoading ? 'Güncelleniyor...' : 'Verileri Yenile'}
+          </motion.button>
+        </div>
 
         <div className="flex flex-nowrap overflow-x-auto justify-start md:justify-center items-end gap-2 md:gap-4 mb-6 md:mb-12 py-2 px-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
           {filterButtonsData.map((categoryButton) => (

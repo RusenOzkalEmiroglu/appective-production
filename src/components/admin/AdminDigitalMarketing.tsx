@@ -25,7 +25,17 @@ const AdminDigitalMarketingPage = () => {
         throw new Error('Failed to fetch digital marketing items');
       }
       const data = await response.json();
-      setItems(data);
+      // Transform snake_case API response to camelCase for frontend
+      const transformedData: DigitalMarketingItem[] = data.map((item: any) => ({
+        id: item.id,
+        title: item.title,
+        client: item.client,
+        description: item.description,
+        image: item.image,
+        services: item.services,
+        projectUrl: item.project_url // Convert snake_case to camelCase
+      }));
+      setItems(transformedData);
       setError(null);
     } catch (err) {
       console.error(err);

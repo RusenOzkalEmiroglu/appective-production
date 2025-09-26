@@ -60,13 +60,13 @@ const DigitalMarketingForm: React.FC<DigitalMarketingFormProps> = ({ onSubmit, o
       description,
       image,
       services: servicesArray,
-      projectUrl,
+      project_url: projectUrl, // Convert camelCase to snake_case for API
     };
 
     if (initialData && initialData.id) {
-      onSubmit({ ...itemToSubmit, id: initialData.id });
+      onSubmit({ ...itemToSubmit, id: initialData.id } as any);
     } else {
-      onSubmit(itemToSubmit);
+      onSubmit(itemToSubmit as any);
     }
   };
 

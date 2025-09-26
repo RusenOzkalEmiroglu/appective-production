@@ -302,8 +302,17 @@ const Services = () => {
           const errorData = await response.json().catch(() => ({ message: 'Failed to fetch services data.'}));
           throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
         }
-        const data: ServiceCategory[] = await response.json();
-        setFetchedServiceCategories(data);
+        const data = await response.json();
+        // Transform snake_case API response to camelCase for frontend
+        const transformedData: ServiceCategory[] = data.map((service: any) => ({
+          id: service.id,
+          name: service.name,
+          description: service.description,
+          icon: service.icon,
+          folderName: service.folder_name, // Convert snake_case to camelCase
+          imageUrl: service.image_url
+        }));
+        setFetchedServiceCategories(transformedData);
       } catch (err: any) {
         console.error("Error fetching services:", err);
         setError(err.message || 'An unexpected error occurred.');

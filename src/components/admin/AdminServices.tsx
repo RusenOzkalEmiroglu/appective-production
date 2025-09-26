@@ -73,9 +73,18 @@ const AdminServicesPage = () => {
         const errData = await response.json().catch(() => ({ message: 'Failed to fetch services' }));
         throw new Error(errData.message || `HTTP error! status: ${response.status}`);
       }
-      const data: ServiceCategory[] = await response.json();
-      setServices(data);
-      setFilteredServices(data); 
+      const data = await response.json();
+      // Transform snake_case API response to camelCase for frontend
+      const transformedData: ServiceCategory[] = data.map((service: any) => ({
+        id: service.id,
+        name: service.name,
+        description: service.description,
+        icon: service.icon,
+        folderName: service.folder_name, // Convert snake_case to camelCase
+        imageUrl: service.image_url
+      }));
+      setServices(transformedData);
+      setFilteredServices(transformedData); 
     } catch (err: any) {
       console.error("Fetch Services Error:", err);
       setError(err.message || 'Could not load services.');

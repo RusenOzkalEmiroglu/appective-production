@@ -5,6 +5,10 @@ import { MastheadItem } from '@/types/masthead';
 
 // --- Public Handlers ---
 
+// Force dynamic rendering to avoid Vercel Edge Cache
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET(request: NextRequest) {
   try {
     const { data, error } = await supabase

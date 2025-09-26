@@ -3,6 +3,10 @@ import { supabase } from '@/lib/supabase';
 import { assertSupabaseAdmin } from '@/lib/supabaseAdmin';
 import { withAdminAuthSimple } from '@/lib/withAdminAuth';
 
+// Force dynamic rendering to avoid Vercel Edge Cache
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // GET handler - fetch services from Supabase
 export async function GET() {
   try {
@@ -16,7 +20,16 @@ export async function GET() {
       return NextResponse.json({ message: 'Failed to fetch services data' }, { status: 500 });
     }
     
-    return NextResponse.json(data || []);
+    const response = NextResponse.json(data || []);
+    
+    // Force fresh data - prevent all caching
+    response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate, private');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+    response.headers.set('Vercel-CDN-Cache-Control', 'no-cache');
+    response.headers.set('CDN-Cache-Control', 'no-cache');
+    
+    return response;
   } catch (error) {
     console.error('Error reading services data:', error);
     return NextResponse.json({ message: 'Failed to read services data' }, { status: 500 });

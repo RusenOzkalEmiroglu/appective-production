@@ -1,7 +1,11 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
-export async function GET() {
+// Force dynamic rendering to avoid Vercel Edge Cache
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+export async function GET(request: NextRequest) {
   try {
     console.log('=== Partners API GET Start ===');
     
@@ -64,10 +68,18 @@ export async function GET() {
 
     const response = NextResponse.json(categoriesWithLogos);
     
-    // Add cache control headers to ensure fresh data
-    response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    // Force fresh data - prevent all caching
+    response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate, private');
     response.headers.set('Pragma', 'no-cache');
     response.headers.set('Expires', '0');
+    
+    // Generate ETag based on data to force cache busting
+    const dataHash = JSON.stringify(categoriesWithLogos).length + Date.now();
+    response.headers.set('ETag', `"${dataHash}"`);
+    
+    // Vercel-specific headers to prevent edge caching
+    response.headers.set('Vercel-CDN-Cache-Control', 'no-cache');
+    response.headers.set('CDN-Cache-Control', 'no-cache');
     
     return response;
 

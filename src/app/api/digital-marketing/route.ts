@@ -4,6 +4,10 @@ import { DigitalMarketingItem, initialDigitalMarketingItems } from '@/data/digit
 import { withAdminAuthSimple } from '@/lib/withAdminAuth';
 import { assertSupabaseAdmin } from '@/lib/supabaseAdmin';
 
+// Force dynamic rendering to avoid Vercel Edge Cache
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET() {
   try {
     const { data, error } = await supabase

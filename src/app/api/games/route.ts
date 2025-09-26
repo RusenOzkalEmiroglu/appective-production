@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { GameItem, initialGames as initialGamesData } from '@/data/gamesData';
 
+// Force dynamic rendering to avoid Vercel Edge Cache
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET() {
   try {
     const { data, error } = await supabase

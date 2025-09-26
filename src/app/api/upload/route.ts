@@ -12,8 +12,12 @@ function generateSafeName(originalName: string): string {
   const clean = originalName.replace(/[^a-zA-Z0-9.-]/g, '_');
   const stamp = Date.now().toString(36);
   const rand = Math.random().toString(36).slice(2, 8);
-  const ext = path.extname(clean);
-  const base = path.basename(clean, ext);
+  
+  // Extract extension manually without using path module
+  const lastDotIndex = clean.lastIndexOf('.');
+  const ext = lastDotIndex > 0 ? clean.substring(lastDotIndex) : '';
+  const base = lastDotIndex > 0 ? clean.substring(0, lastDotIndex) : clean;
+  
   return `${base}-${stamp}-${rand}${ext}`;
 }
 

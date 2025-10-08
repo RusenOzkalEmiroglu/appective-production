@@ -109,13 +109,13 @@ async function saveZipToSupabase(file: File, category: string, brand: string) {
     
     return { filePath: htmlPath };
     
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error extracting ZIP:', error);
     // Clean up directory if extraction failed
     if (fs.existsSync(localDir)) {
       fs.rmSync(localDir, { recursive: true, force: true });
     }
-    throw new Error(`ZIP extraction failed: ${error.message}`);
+    throw new Error(`ZIP extraction failed: ${error?.message || 'Unknown error'}`);
   }
 }
 
@@ -128,7 +128,7 @@ async function extractExistingZipFiles() {
     return;
   }
 
-  const extractedFiles = [];
+  const extractedFiles: string[] = [];
   
   // Recursively find all ZIP files
   function findZipFiles(dir: string) {

@@ -16,8 +16,8 @@ async function extractExistingZipFiles() {
     return { success: false, message: 'No interactive_mastheads_zips directory found' };
   }
 
-  const extractedFiles = [];
-  const errors = [];
+  const extractedFiles: string[] = [];
+  const errors: Array<{ file: string; error: string }> = [];
   
   // Recursively find all ZIP files
   function findZipFiles(dir: string) {
@@ -74,9 +74,9 @@ async function extractExistingZipFiles() {
       fs.unlinkSync(zipPath);
       console.log(`Successfully extracted and removed: ${zipPath}`);
       
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Error extracting ${zipPath}:`, error);
-      errors.push({ file: zipPath, error: error.message });
+      errors.push({ file: zipPath, error: error?.message || 'Unknown error' });
     }
   }
   

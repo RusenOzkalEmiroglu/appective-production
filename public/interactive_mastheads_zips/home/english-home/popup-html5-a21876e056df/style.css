@@ -1,0 +1,478 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Epilogue', 'Roboto', sans-serif;
+  background: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.masthead-bg {
+  position: relative;
+  width: 970px;
+  max-width: 100%;
+  min-width: 320px;
+  height: 250px;
+  background: #a4a4cd;
+  overflow: hidden;
+  margin: 0 auto;
+  box-sizing: border-box;
+  border-radius: 0;
+  margin-bottom: 32px;
+}
+
+.masthead-bg .bg-column {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  background: #061629;
+  opacity: 0.8;
+  border-radius: 8px;
+}
+
+.masthead-bg .bg-column.col1 { left: 10%; }
+.masthead-bg .bg-column.col2 { left: 30%; }
+.masthead-bg .bg-column.col3 { left: 60%; }
+.masthead-bg .bg-column.col4 { left: 80%; }
+
+.masthead-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  height: 100%;
+  width: 100%;
+  padding: 0 32px;
+  box-sizing: border-box;
+}
+
+.masthead-left {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  height: 100%;
+  padding-top: 4px;
+}
+
+.masthead-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  width: 100%;
+  left: 24%;
+  top: 50%;
+}
+
+.masthead-right {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+}
+
+.masthead-logo img {
+  display: block;
+  max-height: 110px;
+  max-width: 560px;
+}
+
+.masthead-products {
+  display: flex;
+  gap: 10px;
+  padding-top: 0;
+  margin-top: 13%;
+}
+
+.product-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  position: relative;
+  height: auto;
+  margin-bottom: 2px;
+  padding: 0;
+  background: none;
+}
+.product-box[data-category="dekorasyon"],
+.product-box[data-category="kucukevaleti"],
+.product-box[data-category="yatakodasi"],
+.product-box[data-category="porselen"] {
+  border-bottom: none;
+}
+
+.arrow-btn {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  color: #0a2240;
+  border: 1px solid #a4a4cd;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s;
+  z-index: 2;
+}
+.arrow-btn.up {
+  top: -12px;
+}
+.arrow-btn.down {
+  bottom: -12px;
+}
+.arrow-btn:hover {
+  background: #a4a4cd;
+  color: #0a2240;
+}
+
+.product-img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  background: #A4A4CD;
+  box-shadow: 0 2px 8px #00000014;
+  margin: 0;
+  padding: 0;
+  border: 2px solid #fff;
+}
+
+.product-img-wrapper {
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  position: relative;
+  margin: 0;
+  margin-top: 3px;
+}
+
+.slide-up {
+  animation: slideUpOut 0.3s forwards;
+}
+.slide-down {
+  animation: slideDownOut 0.3s forwards;
+}
+.slide-up-in {
+  animation: slideUpIn 0.3s forwards;
+}
+.slide-down-in {
+  animation: slideDownIn 0.3s forwards;
+}
+
+@keyframes slideUpOut {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-100%); }
+}
+@keyframes slideDownOut {
+  0% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(100%); }
+}
+@keyframes slideUpIn {
+  0% { opacity: 0; transform: translateY(100%); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideDownIn {
+  0% { opacity: 0; transform: translateY(-100%); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.countdown-timer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 100px;
+  margin-bottom: 12px;
+}
+
+.countdown-segment {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 44px;
+}
+
+.countdown-value {
+  font-size: 2.2rem;
+  font-family: "Roboto", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
+  color: #fff;
+  background: #8181a3;
+  padding: 0;
+  border-radius: 12px;
+  min-width: 64px;
+  min-height: 64px;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  letter-spacing: 1px;
+  border: 2px solid #fff;
+  box-sizing: border-box;
+  box-shadow: 0 0 16px 2px #ffe60055, 0 2px 12px #0a224055;
+  position: relative;
+  animation: pulseBorder 1.8s infinite alternate;
+  overflow: hidden;
+}
+
+.countdown-value::after {
+  content: '';
+  position: absolute;
+  top: -30%;
+  left: -30%;
+  width: 160%;
+  height: 60%;
+  background: linear-gradient(120deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.01) 100%);
+  transform: rotate(8deg);
+  pointer-events: none;
+  animation: shine 2.5s infinite linear;
+}
+
+@keyframes pulseBorder {
+  0% { box-shadow: 0 0 16px 2px #ffe60055, 0 2px 12px #0a224055; border-color: #fff; }
+  100% { box-shadow: 0 0 32px 8px #ffe60099, 0 4px 24px #0a224099; border-color: #ffe600; }
+}
+
+@keyframes shine {
+  0% { left: -30%; }
+  100% { left: 100%; }
+}
+
+.countdown-label {
+  font-size: 0.75rem;
+  color: #0a2240;
+  margin-top: 5px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.countdown-separator {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #0a2240;
+  align-self: flex-end;
+  margin-bottom: 2px;
+}
+
+.countdown-target-date {
+  font-size: 0.95rem;
+  color: #02108e;
+  text-align: center;
+  margin-bottom: 8px;
+  font-family: "Roboto", sans-serif;
+  opacity: 0.7;
+}
+
+.countdown-heading {
+  text-align: center;
+  margin-bottom: -80px;
+  margin-top: 18px;
+}
+
+.countdown-title {
+  font-family: "Epilogue", "Roboto", sans-serif;
+  font-size: clamp(1rem, 2.2vw, 1.5rem);
+  font-weight: 400;
+  color: #0a2240;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-shadow: 0 2px 12px #ffe60033, 0 1px 0 #fff3;
+  animation: popTitle 1.2s cubic-bezier(.23,1.12,.62,1.01) forwards, pulseScale 2.2s 1.2s infinite ease-in-out;
+  background: none;
+  -webkit-background-clip: initial;
+  -webkit-text-fill-color: initial;
+  background-clip: initial;
+  text-fill-color: initial;
+}
+
+.countdown-subtitle {
+  font-family: "Epilogue", "Roboto", sans-serif;
+  font-size: clamp(1.2rem, 3vw, 2.1rem);
+  font-weight: 900;
+  color: #0a2240;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-shadow: 0 4px 16px #0a224033, 0 1px 0 #fff3;
+  animation: popTitle 1.2s cubic-bezier(.23,1.12,.62,1.01) forwards, pulseScale 2.2s 1.2s infinite ease-in-out;
+  background: none;
+  -webkit-background-clip: initial;
+  -webkit-text-fill-color: initial;
+  background-clip: initial;
+  text-fill-color: initial;
+}
+
+@keyframes popTitle {
+  0% { transform: scale(0.8) translateY(-20px); opacity: 0; }
+  80% { transform: scale(1.05) translateY(2px); opacity: 1; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+@keyframes pulseScale {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.08); }
+  60% { transform: scale(0.96); }
+  100% { transform: scale(1); }
+}
+
+.right-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 3px;
+  margin-left: 15px;
+  text-align: center;
+}
+
+.basket-title {
+  font-family: "Epilogue", "Roboto", sans-serif;
+  font-size: 1.25rem;
+  color: #02108e;
+  font-weight: 700;
+  margin-bottom: 10px;
+  text-align: center;
+  margin-top: -5px;
+}
+
+.basket-btn {
+  font-family: "Roboto", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  background: #02108e;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 24px;
+  margin-bottom: 18px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  margin-top: -2px;
+  text-decoration: none;
+  display: inline-block;
+}
+.basket-btn:hover {
+  background: #01104d;
+  color: #fff;
+  transform: scale(1.07);
+  box-shadow: 0 4px 16px #02108e33;
+}
+
+.countdown-title, .countdown-subtitle {
+  color: #0a2240 !important;
+}
+
+.campaign-info {
+  color: #888;
+  font-size: 0.65rem;
+  font-family: "Roboto", sans-serif;
+  margin-top: -12px;
+  text-align: left;
+  font-weight: 400;
+}
+
+.product-category-label {
+  display: block;
+  position: relative;
+  top: 0;
+  left: 45%;
+  transform: translateX(-50%);
+  background: rgba(255,255,255,0.4);
+  color: #0a2240;
+  font-size: 0.78rem;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  padding: 2px 10px;
+  border-radius: 8px;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0.5;
+  margin-bottom: 3px;
+}
+
+.product-box[data-category="dekorasyon"] > .product-category-label {
+  left: 35%;
+}
+.product-box[data-category="kucukevaleti"] > .product-category-label {
+  left: 46%;
+}
+.product-box[data-category="yatakodasi"] > .product-category-label {
+  left: 36%;
+}
+.product-box[data-category="porselen"] > .product-category-label {
+  left: 46%;
+}
+
+@media (max-width: 1024px) {
+  .masthead-bg {
+    width: 98vw;
+    min-width: 0;
+    height: 180px;
+  }
+  .masthead-content {
+    padding: 0 12px;
+  }
+  .product-img {
+    max-height: 80px;
+    max-width: 80px;
+  }
+  .masthead-products {
+    margin-right: 8px;
+  }
+}
+
+@media (max-width: 600px) {
+  .masthead-bg {
+    height: 120px;
+    border-radius: 6px;
+  }
+  .masthead-logo img {
+    max-height: 36px;
+    max-width: 90px;
+  }
+  .product-img {
+    max-height: 36px;
+    max-width: 36px;
+  }
+  .masthead-content {
+    gap: 8px;
+  }
+  .countdown-timer {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .masthead-products {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 7.5px;
+    padding-bottom: 8px;
+    margin-top: 0;
+  }
+  .product-box {
+    min-width: 120px;
+    max-width: 140px;
+    margin-bottom: 0;
+  }
+} 

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Büyük İndirim Masthead</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="masthead-bg">
+    <div class="masthead-logo" style="position:absolute;top:-75%;left:20.5%;z-index:10;">
+      <img src="images/logo/logo.png" alt="Marka Logosu" height="40">
+    </div>
+    <div class="masthead-content">
+      <div class="masthead-left">
+        <div class="countdown-heading">
+          <div class="countdown-title">BÜYÜK İNDİRİM</div>
+          <div class="countdown-subtitle">YAKLAŞIYOR!</div>
+        </div>
+        <div class="countdown-timer">
+          <div class="countdown-segment">
+            <span class="countdown-value" id="days">00</span>
+            <span class="countdown-label">Gün</span>
+          </div>
+          <div class="countdown-segment">
+            <span class="countdown-value" id="hours">00</span>
+            <span class="countdown-label">Saat</span>
+          </div>
+          <div class="countdown-segment">
+            <span class="countdown-value" id="minutes">00</span>
+            <span class="countdown-label">Dakika</span>
+          </div>
+          <div class="countdown-segment">
+            <span class="countdown-value" id="seconds">00</span>
+            <span class="countdown-label">Saniye</span>
+          </div>
+        </div>
+        <div class="right-content">
+          <a class="basket-btn" href="https://www.englishhome.com/?_gl=1*1u4i8m9*_up*MQ..&gclid=CjwKCAjwg7PDBhBxEiwAf1CVu5uOJ1UHE3OdlAbItw34ri8fGO61fGOWP5qEyICrp7sWcdr9Zr8IWBoCLuEQAvD_BwE&gbraid=0AAAAADwrz1J_fL9z2qruWpXcqiRPY-ETA" target="_blank" rel="noopener noreferrer">Hemen sepet oluştur</a>
+        </div>
+      </div>
+      <div class="masthead-right">
+        <div class="masthead-products">
+          <div class="product-box" data-category="dekorasyon">
+            <span class="product-category-label">Dekorasyon</span>
+            <div class="product-img-wrapper" id="wrap-dekorasyon">
+              <button class="arrow-btn up" onclick="changeImage('dekorasyon', -1)">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#0a2240"><path d="M440-160v-487L216-423l-56-57 320-320 320 320-56 57-224-224v487h-80Z"/></svg>
+              </button>
+              <img src="images/ürünler/Dekorasyon/dekorasyon1.jpg" alt="Dekorasyon" class="product-img" id="img-dekorasyon">
+              <button class="arrow-btn down" onclick="changeImage('dekorasyon', 1)">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#0a2240"><path d="M440-800v487L216-537l-56 57 320 320 320-320-56-57-224 224v-487h-80Z"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="product-box" data-category="kucukevaleti">
+            <span class="product-category-label">Küçük Ev Aletleri</span>
+            <div class="product-img-wrapper" id="wrap-kucukevaleti">
+              <button class="arrow-btn up" onclick="changeImage('kucukevaleti', -1)">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#0a2240"><path d="M440-160v-487L216-423l-56-57 320-320 320 320-56 57-224-224v487h-80Z"/></svg>
+              </button>
+              <img src="images/ürünler/Küçük ev aletleri/kucukevaleti1.jpg" alt="Küçük Ev Aletleri" class="product-img" id="img-kucukevaleti">
+              <button class="arrow-btn down" onclick="changeImage('kucukevaleti', 1)">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#0a2240"><path d="M440-800v487L216-537l-56 57 320 320 320-320-56-57-224 224v-487h-80Z"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="product-box" data-category="yatakodasi">
+            <span class="product-category-label">Yatak Odası</span>
+            <div class="product-img-wrapper" id="wrap-yatakodasi">
+              <button class="arrow-btn up" onclick="changeImage('yatakodasi', -1)">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#0a2240"><path d="M440-160v-487L216-423l-56-57 320-320 320 320-56 57-224-224v487h-80Z"/></svg>
+              </button>
+              <img src="images/ürünler/Yatak odası/yatakodası1.jpg" alt="Yatak Odası" class="product-img" id="img-yatakodasi">
+              <button class="arrow-btn down" onclick="changeImage('yatakodasi', 1)">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#0a2240"><path d="M440-800v487L216-537l-56 57 320 320 320-320-56-57-224 224v-487h-80Z"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="product-box" data-category="porselen">
+            <span class="product-category-label">Yemek Takımları</span>
+            <div class="product-img-wrapper" id="wrap-porselen">
+              <button class="arrow-btn up" onclick="changeImage('porselen', -1)">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#0a2240"><path d="M440-160v-487L216-423l-56-57 320-320 320 320-56 57-224-224v487h-80Z"/></svg>
+              </button>
+              <img src="images/ürünler/Yemek takımları/porselen1.jpg" alt="Yemek Takımları" class="product-img" id="img-porselen">
+              <button class="arrow-btn down" onclick="changeImage('porselen', 1)">
+                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#0a2240"><path d="M440-800v487L216-537l-56 57 320 320 320-320-56-57-224 224v-487h-80Z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="campaign-info">
+      *Kampanya 3-31 Temmuz tarihleri arasında 250 TL ve üzeri alışverişlerde geçerlidir. Her üründen en az 1 adet bulunmaktadır.
+    </div>
+  </div>
+</body>
+<script>
+// 1 Temmuz 2025 00:00:00 tarihine geri sayım
+const countdownDate = new Date('2025-07-01T00:00:00').getTime();
+
+function updateCountdown() {
+  const now = new Date().getTime();
+  const distance = countdownDate - now;
+
+  let days = 0, hours = 0, minutes = 0, seconds = 0;
+  if (distance !== 0) {
+    days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    seconds = Math.floor((distance % (1000 * 60)) / 1000);
+  }
+
+  document.getElementById('days').textContent = (days < 0 ? '-' : '') + String(Math.abs(days)).padStart(2, '0');
+  document.getElementById('hours').textContent = (hours < 0 ? '-' : '') + String(Math.abs(hours)).padStart(2, '0');
+  document.getElementById('minutes').textContent = (minutes < 0 ? '-' : '') + String(Math.abs(minutes)).padStart(2, '0');
+  document.getElementById('seconds').textContent = (seconds < 0 ? '-' : '') + String(Math.abs(seconds)).padStart(2, '0');
+}
+
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+const productImages = {
+  dekorasyon: [
+    'images/ürünler/Dekorasyon/dekorasyon1.jpg',
+    'images/ürünler/Dekorasyon/dekorasyon2.jpg',
+    'images/ürünler/Dekorasyon/dekorasyon3.jpg',
+    'images/ürünler/Dekorasyon/dekorasyon4.jpg'
+  ],
+  kucukevaleti: [
+    'images/ürünler/Küçük ev aletleri/kucukevaleti1.jpg',
+    'images/ürünler/Küçük ev aletleri/kucukevaleti2.jpg',
+    'images/ürünler/Küçük ev aletleri/kucukevaleti3.jpg',
+    'images/ürünler/Küçük ev aletleri/kucukevaleti4.jpg'
+  ],
+  yatakodasi: [
+    'images/ürünler/Yatak odası/yatakodası1.jpg',
+    'images/ürünler/Yatak odası/yatakodası2.jpg',
+    'images/ürünler/Yatak odası/yatakodası3.jpg',
+    'images/ürünler/Yatak odası/yatakodası4.jpg'
+  ],
+  porselen: [
+    'images/ürünler/Yemek takımları/porselen1.jpg',
+    'images/ürünler/Yemek takımları/porselen2.jpg',
+    'images/ürünler/Yemek takımları/porselen3.jpg',
+    'images/ürünler/Yemek takımları/porselen4.webp'
+  ]
+};
+const productIndexes = { dekorasyon: 0, kucukevaleti: 0, yatakodasi: 0, porselen: 0 };
+function changeImage(category, direction) {
+  const images = productImages[category];
+  let idx = productIndexes[category] + direction;
+  if (idx < 0) idx = images.length - 1;
+  if (idx >= images.length) idx = 0;
+  const wrapper = document.getElementById('wrap-' + category);
+  const img = document.getElementById('img-' + category);
+  // Slide out
+  img.classList.add(direction > 0 ? 'slide-down' : 'slide-up');
+  setTimeout(() => {
+    img.src = images[idx];
+    img.classList.remove('slide-down', 'slide-up');
+    img.classList.add(direction > 0 ? 'slide-down-in' : 'slide-up-in');
+    setTimeout(() => {
+      img.classList.remove('slide-down-in', 'slide-up-in');
+    }, 300);
+  }, 300);
+  productIndexes[category] = idx;
+}
+</script>
+</html> 

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masthead Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f0f0;
+        }
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-item {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-item h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        .test-item p {
+            margin: 5px 0;
+            color: #666;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .iframe-container {
+            margin: 20px 0;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        iframe {
+            width: 100%;
+            height: 300px;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Masthead Popup Test</h1>
+        <p>Bu sayfa DORITOS & PEPSI ve FAIRY kayıtlarının doğru şekilde çalışıp çalışmadığını test eder.</p>
+        
+        <div class="test-item">
+            <h3>Test 1: DORITOS & PEPSI (Zip URL → HTML Path)</h3>
+            <p><strong>Original URL:</strong> https://oqwlelnvdrproefwrowm.supabase.co/storage/v1/object/public/appective-files/interactive_mastheads_zips/food---beverage/doritos---pepsi/popup-html5-b5debecb50d0.zip</p>
+            <p><strong>Converted Path:</strong> /interactive_mastheads_zips/food---beverage/doritos---pepsi/popup-html5-b5debecb50d0/index.html</p>
+            <button class="test-button" onclick="testDoritos()">Test DORITOS & PEPSI</button>
+            <div id="doritos-result"></div>
+        </div>
+        
+        <div class="test-item">
+            <h3>Test 2: FAIRY (Already HTML Path)</h3>
+            <p><strong>Path:</strong> /interactive_mastheads_zips/uncategorized/unknown/popup-html5-b4588632a7d6/index.html</p>
+            <button class="test-button" onclick="testFairy()">Test FAIRY</button>
+            <div id="fairy-result"></div>
+        </div>
+    </div>
+
+    <script>
+        function convertZipUrlToHtmlPath(url) {
+            // If it's already a local HTML path, return as is
+            if (url.startsWith('/interactive_mastheads_zips/') && url.endsWith('/index.html')) {
+                return url;
+            }
+            
+            // If it's a Supabase zip URL, convert to local HTML path
+            if (url.includes('supabase.co/storage/v1/object/public/appective-files/interactive_mastheads_zips/') && url.endsWith('.zip')) {
+                // Extract the path from the URL
+                const urlParts = url.split('/interactive_mastheads_zips/')[1];
+                if (urlParts) {
+                    const zipPath = urlParts.replace('.zip', '');
+                    return `/interactive_mastheads_zips/${zipPath}/index.html`;
+                }
+            }
+            
+            // Return original URL if no conversion needed
+            return url;
+        }
+
+        function testDoritos() {
+            const originalUrl = 'https://oqwlelnvdrproefwrowm.supabase.co/storage/v1/object/public/appective-files/interactive_mastheads_zips/food---beverage/doritos---pepsi/popup-html5-b5debecb50d0.zip';
+            const convertedPath = convertZipUrlToHtmlPath(originalUrl);
+            
+            const resultDiv = document.getElementById('doritos-result');
+            resultDiv.innerHTML = `
+                <div class="iframe-container">
+                    <iframe src="${convertedPath}" title="DORITOS & PEPSI Masthead"></iframe>
+                </div>
+                <p><strong>Status:</strong> <span style="color: green;">✓ Converted and loaded</span></p>
+            `;
+        }
+
+        function testFairy() {
+            const path = '/interactive_mastheads_zips/uncategorized/unknown/popup-html5-b4588632a7d6/index.html';
+            const convertedPath = convertZipUrlToHtmlPath(path);
+            
+            const resultDiv = document.getElementById('fairy-result');
+            resultDiv.innerHTML = `
+                <div class="iframe-container">
+                    <iframe src="${convertedPath}" title="FAIRY Masthead"></iframe>
+                </div>
+                <p><strong>Status:</strong> <span style="color: green;">✓ Already HTML path, loaded directly</span></p>
+            `;
+        }
+    </script>
+</body>
+</html>

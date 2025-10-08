@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 import AdmZip from 'adm-zip';
+import * as fs from 'fs';
+import * as path from 'path';
 import { withAdminAuthSimple } from '@/lib/withAdminAuth';
 
 // Force dynamic rendering to avoid Vercel Edge Cache
@@ -67,33 +69,126 @@ async function saveZipToSupabase(file: File, category: string, brand: string) {
   const buffer = Buffer.from(bytes);
 
   const hash = generateHash(12);
-  const zipFileName = `popup-html5-${hash}.zip`;
+  const zipFileName = `popup-html5-${hash}`;
   
-  // Storage path: interactive_mastheads_zips/category/brand/filename
-  const storagePath = `interactive_mastheads_zips/${category}/${brand}/${zipFileName}`;
+  // Create local directory for extracted files
+  const localDir = path.join(process.cwd(), 'public', 'interactive_mastheads_zips', category, brand, zipFileName);
   
-  const { data, error } = await supabaseAdmin.storage
-    .from('appective-files')
-    .upload(storagePath, buffer, {
-      contentType: 'application/zip',
-      upsert: true // Overwrite if exists
-    });
-
-  if (error) {
-    console.error('Supabase storage error:', error);
-    throw new Error(`Storage upload failed: ${error.message}`);
+  // Ensure directory exists
+  if (!fs.existsSync(localDir)) {
+    fs.mkdirSync(localDir, { recursive: true });
   }
 
-  // Get public URL
-  const { data: { publicUrl } } = supabaseAdmin.storage
-    .from('appective-files')
-    .getPublicUrl(storagePath);
+  try {
+    // Extract ZIP file
+    const zip = new AdmZip(buffer);
+    zip.extractAllTo(localDir, true);
+    
+    console.log('ZIP extracted successfully to:', localDir);
+    
+    // Check if index.html exists
+    const indexPath = path.join(localDir, 'index.html');
+    if (!fs.existsSync(indexPath)) {
+      // Look for any HTML file in the root
+      const files = fs.readdirSync(localDir);
+      const htmlFile = files.find(file => file.toLowerCase().endsWith('.html'));
+      
+      if (htmlFile) {
+        // Rename the HTML file to index.html
+        const oldPath = path.join(localDir, htmlFile);
+        fs.renameSync(oldPath, indexPath);
+        console.log(`Renamed ${htmlFile} to index.html`);
+      } else {
+        throw new Error('No HTML file found in the ZIP archive');
+      }
+    }
+    
+    // Return the path to the HTML file
+    const htmlPath = `/interactive_mastheads_zips/${category}/${brand}/${zipFileName}/index.html`;
+    console.log('HTML path created:', htmlPath);
+    
+    return { filePath: htmlPath };
+    
+  } catch (error) {
+    console.error('Error extracting ZIP:', error);
+    // Clean up directory if extraction failed
+    if (fs.existsSync(localDir)) {
+      fs.rmSync(localDir, { recursive: true, force: true });
+    }
+    throw new Error(`ZIP extraction failed: ${error.message}`);
+  }
+}
 
-  console.log('ZIP uploaded successfully:', { storagePath, publicUrl });
+// Helper function to extract existing ZIP files
+async function extractExistingZipFiles() {
+  const zipDir = path.join(process.cwd(), 'public', 'interactive_mastheads_zips');
   
-  // For HTML5 ads, we return the zip URL as the file path
-  // The frontend can handle zip extraction or preview as needed
-  return { filePath: publicUrl };
+  if (!fs.existsSync(zipDir)) {
+    console.log('No interactive_mastheads_zips directory found');
+    return;
+  }
+
+  const extractedFiles = [];
+  
+  // Recursively find all ZIP files
+  function findZipFiles(dir: string) {
+    const items = fs.readdirSync(dir);
+    
+    for (const item of items) {
+      const fullPath = path.join(dir, item);
+      const stat = fs.statSync(fullPath);
+      
+      if (stat.isDirectory()) {
+        findZipFiles(fullPath);
+      } else if (item.toLowerCase().endsWith('.zip') && item.startsWith('temp-')) {
+        extractedFiles.push(fullPath);
+      }
+    }
+  }
+  
+  findZipFiles(zipDir);
+  
+  console.log(`Found ${extractedFiles.length} ZIP files to extract`);
+  
+  for (const zipPath of extractedFiles) {
+    try {
+      const zip = new AdmZip(zipPath);
+      const zipDir = path.dirname(zipPath);
+      const zipName = path.basename(zipPath, '.zip');
+      
+      // Remove 'temp-' prefix
+      const cleanName = zipName.replace(/^temp-/, '');
+      const extractDir = path.join(zipDir, cleanName);
+      
+      // Create extraction directory
+      if (!fs.existsSync(extractDir)) {
+        fs.mkdirSync(extractDir, { recursive: true });
+      }
+      
+      // Extract ZIP file
+      zip.extractAllTo(extractDir, true);
+      
+      // Check if index.html exists, if not rename any HTML file
+      const indexPath = path.join(extractDir, 'index.html');
+      if (!fs.existsSync(indexPath)) {
+        const files = fs.readdirSync(extractDir);
+        const htmlFile = files.find(file => file.toLowerCase().endsWith('.html'));
+        
+        if (htmlFile) {
+          const oldPath = path.join(extractDir, htmlFile);
+          fs.renameSync(oldPath, indexPath);
+          console.log(`Renamed ${htmlFile} to index.html in ${extractDir}`);
+        }
+      }
+      
+      // Remove the ZIP file after successful extraction
+      fs.unlinkSync(zipPath);
+      console.log(`Successfully extracted and removed: ${zipPath}`);
+      
+    } catch (error) {
+      console.error(`Error extracting ${zipPath}:`, error);
+    }
+  }
 }
 
 async function postHandler(request: NextRequest) {

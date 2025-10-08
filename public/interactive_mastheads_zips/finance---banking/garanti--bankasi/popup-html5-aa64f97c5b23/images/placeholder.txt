@@ -1,0 +1,1 @@
+Please add your image assets to this directory. Refer to README.md for the required file names.

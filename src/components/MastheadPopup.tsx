@@ -11,6 +11,27 @@ interface MastheadPopupProps {
 }
 
 const MastheadPopup = ({ masthead, onClose }: MastheadPopupProps) => {
+  // Function to convert zip URLs to HTML paths
+  const convertZipUrlToHtmlPath = (url: string): string => {
+    // If it's already a local HTML path, return as is
+    if (url.startsWith('/interactive_mastheads_zips/') && url.endsWith('/index.html')) {
+      return url;
+    }
+    
+    // If it's a Supabase zip URL, convert to local HTML path
+    if (url.includes('supabase.co/storage/v1/object/public/appective-files/interactive_mastheads_zips/') && url.endsWith('.zip')) {
+      // Extract the path from the URL
+      const urlParts = url.split('/interactive_mastheads_zips/')[1];
+      if (urlParts) {
+        const zipPath = urlParts.replace('.zip', '');
+        return `/interactive_mastheads_zips/${zipPath}/index.html`;
+      }
+    }
+    
+    // Return original URL if no conversion needed
+    return url;
+  };
+
   const dimensions = useMemo(() => {
     if (!masthead?.bannerDetails.size) return { width: 'auto', height: 'auto' };
     
@@ -97,7 +118,7 @@ const MastheadPopup = ({ masthead, onClose }: MastheadPopupProps) => {
               }}
             >
               <iframe
-                src={masthead.popupHtmlPath}
+                src={convertZipUrlToHtmlPath(masthead.popupHtmlPath)}
                 width={(dimensions as any).isFullPage ? '100%' : dimensions.width}
                 height={(dimensions as any).isFullPage ? '100%' : dimensions.height}
                 frameBorder="0"

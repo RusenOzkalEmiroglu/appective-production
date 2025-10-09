@@ -45,9 +45,29 @@ cp env.example .env.local
 ```env
 NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ```
 
-5. Geliştirme sunucusunu başlatın:
+5. **ÖNEMLİ: Supabase Storage Bucket Ayarları**
+
+Admin panelinde ZIP dosyası upload edebilmek için Supabase bucket'ınızı yapılandırın:
+
+**Supabase Dashboard → Storage → `appective-files` bucket → Settings (⚙️)**
+
+**Allowed MIME types** kısmına şunları ekleyin:
+- `application/zip`
+- `text/html`
+- `text/css`  
+- `application/javascript`
+- `application/octet-stream`
+- `image/*` (zaten vardır)
+
+**Bucket Settings:**
+- Public: Yes ✅
+- File size limit: 50MB
+- Allowed MIME types: Yukarıdaki listede belirtilenler
+
+6. Geliştirme sunucusunu başlatın:
 ```bash
 npm run dev
 ```

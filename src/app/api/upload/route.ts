@@ -67,92 +67,66 @@ async function saveZipToSupabase(file: File, category: string, brand: string) {
   const buffer = Buffer.from(bytes);
 
   const hash = generateHash(12);
-  const folderName = `popup-html5-${hash}`;
+  const zipFileName = `popup-html5-${hash}.zip`;
   
-  console.log('Extracting ZIP and uploading files to Supabase Storage...');
+  // Storage path for the original ZIP file
+  const zipStoragePath = `html5-ads/${category}/${brand}/${zipFileName}`;
+  
+  console.log('Uploading original ZIP to Supabase Storage:', zipStoragePath);
 
-  try {
-    // Extract ZIP in memory
-    const zip = new AdmZip(buffer);
-    const zipEntries = zip.getEntries();
-    
-    console.log(`Found ${zipEntries.length} files in ZIP`);
-    
-    let indexHtmlFound = false;
-    const uploadedFiles: string[] = [];
-
-    // Upload each file from the ZIP to Supabase Storage
-    for (const entry of zipEntries) {
-      // Skip directories and system files
-      if (entry.isDirectory || entry.entryName.startsWith('__MACOSX') || entry.entryName.startsWith('.')) {
-        continue;
-      }
-
-      const fileName = entry.entryName;
-      const fileData = entry.getData();
-      
-      // Check if this is index.html
-      if (fileName.toLowerCase() === 'index.html') {
-        indexHtmlFound = true;
-      }
-      
-      // Storage path: zips/interactive-mastheads/category/brand/foldername/filename
-      const storagePath = `zips/interactive-mastheads/${category}/${brand}/${folderName}/${fileName}`;
-      
-      // Use application/octet-stream for ALL files to avoid Supabase bucket restrictions
-      // Browser will still interpret files correctly based on file extension in URL
-      const contentType = 'application/octet-stream';
-
-      // Upload file to Supabase
-      const { error } = await supabaseAdmin.storage
-        .from('appective-files')
-        .upload(storagePath, fileData, {
-          contentType,
-          upsert: true,
-          cacheControl: '3600' // 1 hour cache
-        });
-
-      if (error) {
-        console.error(`Error uploading ${fileName}:`, error);
-        throw new Error(`Failed to upload ${fileName}: ${error.message}`);
-      }
-
-      uploadedFiles.push(storagePath);
-      console.log(`Uploaded: ${storagePath}`);
-    }
-
-    if (!indexHtmlFound) {
-      // If no index.html, look for any HTML file and use it
-      const htmlFile = uploadedFiles.find(f => f.endsWith('.html'));
-      if (!htmlFile) {
-        throw new Error('No HTML file found in ZIP archive');
-      }
-      console.log('Warning: No index.html found, using first HTML file:', htmlFile);
-    }
-
-    // Get public URL for index.html
-    const indexPath = `zips/interactive-mastheads/${category}/${brand}/${folderName}/index.html`;
-    const { data: { publicUrl } } = supabaseAdmin.storage
-      .from('appective-files')
-      .getPublicUrl(indexPath);
-
-    console.log('ZIP extracted and uploaded successfully:', { 
-      folder: folderName, 
-      filesUploaded: uploadedFiles.length,
-      indexUrl: publicUrl 
+  // Upload the original ZIP file to Supabase Storage
+  const { data: zipData, error: zipError } = await supabaseAdmin.storage
+    .from('appective-files')
+    .upload(zipStoragePath, buffer, {
+      contentType: 'application/zip',
+      upsert: true,
+      cacheControl: '3600'
     });
-    
-    return { 
-      filePath: publicUrl,
-      htmlUrl: publicUrl,
-      folder: folderName,
-      filesCount: uploadedFiles.length
-    };
-    
-  } catch (error: any) {
-    console.error('Error extracting ZIP:', error);
-    throw new Error(`ZIP extraction failed: ${error?.message || 'Unknown error'}`);
+
+  if (zipError) {
+    console.error('Supabase storage error:', zipError);
+    throw new Error(`
+❌ SUPABASE BUCKET AYARLARI HATASI!
+
+Lütfen Supabase Dashboard'da şu adımları uygulayın:
+
+1. Supabase Dashboard → Storage → appective-files bucket
+2. Settings (⚙️) → Edit bucket
+3. "Allowed MIME types" kısmına şunları ekleyin:
+   - application/zip
+   - text/html
+   - text/css
+   - application/javascript
+   - application/octet-stream
+
+VEYA
+
+Yeni bir bucket oluşturun:
+- Bucket adı: html5-ads
+- Public: Yes
+- File size limit: 50MB
+- Allowed MIME types: ALL
+
+Hata detayı: ${zipError.message}
+    `.trim());
   }
+
+  // Get public URL for the ZIP file
+  const { data: { publicUrl: zipUrl } } = supabaseAdmin.storage
+    .from('appective-files')
+    .getPublicUrl(zipStoragePath);
+
+  console.log('ZIP uploaded successfully:', { zipStoragePath, zipUrl });
+  
+  // Return ZIP URL - will be converted by frontend
+  return { 
+    filePath: zipUrl,
+    zipUrl: zipUrl,
+    isZipFile: true,
+    category,
+    brand,
+    fileName: zipFileName
+  };
 }
 
 async function postHandler(request: NextRequest) {

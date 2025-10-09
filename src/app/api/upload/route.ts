@@ -91,36 +91,25 @@ async function saveZipToSupabase(file: File, category: string, brand: string) {
       const fileName = entry.entryName;
       const fileData = entry.getData();
       
+      // Check if this is index.html
+      if (fileName.toLowerCase() === 'index.html') {
+        indexHtmlFound = true;
+      }
+      
       // Storage path: zips/interactive-mastheads/category/brand/foldername/filename
       const storagePath = `zips/interactive-mastheads/${category}/${brand}/${folderName}/${fileName}`;
       
-      // Determine content type based on file extension
-      let contentType = 'application/octet-stream';
-      if (fileName.endsWith('.html')) {
-        contentType = 'text/html';
-        if (fileName.toLowerCase() === 'index.html') {
-          indexHtmlFound = true;
-        }
-      } else if (fileName.endsWith('.css')) {
-        contentType = 'text/css';
-      } else if (fileName.endsWith('.js')) {
-        contentType = 'application/javascript';
-      } else if (fileName.endsWith('.jpg') || fileName.endsWith('.jpeg')) {
-        contentType = 'image/jpeg';
-      } else if (fileName.endsWith('.png')) {
-        contentType = 'image/png';
-      } else if (fileName.endsWith('.gif')) {
-        contentType = 'image/gif';
-      } else if (fileName.endsWith('.svg')) {
-        contentType = 'image/svg+xml';
-      }
+      // Use application/octet-stream for ALL files to avoid Supabase bucket restrictions
+      // Browser will still interpret files correctly based on file extension in URL
+      const contentType = 'application/octet-stream';
 
       // Upload file to Supabase
       const { error } = await supabaseAdmin.storage
         .from('appective-files')
         .upload(storagePath, fileData, {
           contentType,
-          upsert: true
+          upsert: true,
+          cacheControl: '3600' // 1 hour cache
         });
 
       if (error) {

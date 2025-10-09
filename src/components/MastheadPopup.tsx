@@ -18,11 +18,8 @@ const MastheadPopup = ({ masthead, onClose }: MastheadPopupProps) => {
       return url;
     }
     
-    // If it's a Supabase ZIP file (new system - needs bucket setup)
-    if (url.includes('supabase.co/storage/v1/object/public/appective-files/html5-ads/') && url.endsWith('.zip')) {
-      // For now, return the ZIP URL - this will trigger download
-      // After bucket MIME types are configured, we can extract and serve HTML
-      console.warn('ZIP file detected - Supabase bucket needs MIME type configuration');
+    // If it's a Supabase HTML URL (new system - extracted files), return as is
+    if (url.includes('supabase.co/storage/v1/object/public/appective-files/html5-ads/') && url.endsWith('/index.html')) {
       return url;
     }
     

@@ -99,10 +99,41 @@ async function saveZipToSupabase(file: File, category: string, brand: string) {
       // Storage path: html5-ads/category/brand/foldername/filename
       const storagePath = `html5-ads/${category}/${brand}/${folderName}/${fileName}`;
       
-      // CRITICAL: Use application/octet-stream for ALL files
-      // This bypasses Supabase bucket MIME type restrictions
-      // Browser will still interpret files correctly based on URL extension
-      const contentType = 'application/octet-stream';
+      // Determine content type based on file extension for proper rendering
+      let contentType = 'application/octet-stream';
+      const lowerFileName = fileName.toLowerCase();
+      
+      if (lowerFileName.endsWith('.html') || lowerFileName.endsWith('.htm')) {
+        contentType = 'text/html; charset=utf-8';
+      } else if (lowerFileName.endsWith('.js')) {
+        contentType = 'application/javascript; charset=utf-8';
+      } else if (lowerFileName.endsWith('.css')) {
+        contentType = 'text/css; charset=utf-8';
+      } else if (lowerFileName.endsWith('.json')) {
+        contentType = 'application/json; charset=utf-8';
+      } else if (lowerFileName.endsWith('.svg')) {
+        contentType = 'image/svg+xml';
+      } else if (lowerFileName.endsWith('.png')) {
+        contentType = 'image/png';
+      } else if (lowerFileName.endsWith('.jpg') || lowerFileName.endsWith('.jpeg')) {
+        contentType = 'image/jpeg';
+      } else if (lowerFileName.endsWith('.gif')) {
+        contentType = 'image/gif';
+      } else if (lowerFileName.endsWith('.webp')) {
+        contentType = 'image/webp';
+      } else if (lowerFileName.endsWith('.woff') || lowerFileName.endsWith('.woff2')) {
+        contentType = 'font/woff2';
+      } else if (lowerFileName.endsWith('.ttf')) {
+        contentType = 'font/ttf';
+      } else if (lowerFileName.endsWith('.otf')) {
+        contentType = 'font/otf';
+      } else if (lowerFileName.endsWith('.mp4')) {
+        contentType = 'video/mp4';
+      } else if (lowerFileName.endsWith('.mp3')) {
+        contentType = 'audio/mpeg';
+      } else if (lowerFileName.endsWith('.xml')) {
+        contentType = 'application/xml; charset=utf-8';
+      }
 
       // Upload file to Supabase - use appective-files bucket
       const { error } = await supabaseAdmin.storage

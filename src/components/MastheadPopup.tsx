@@ -132,6 +132,8 @@ const MastheadPopup = ({ masthead, onClose }: MastheadPopupProps) => {
                 height={(dimensions as any).isFullPage ? '100%' : dimensions.height}
                 frameBorder="0"
                 scrolling={(dimensions as any).isFullPage ? "auto" : "no"}
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+                allow="autoplay; fullscreen; picture-in-picture"
                 style={{ 
                   display: 'block',
                   width: (dimensions as any).isFullPage ? '100%' : `${dimensions.width}px`,

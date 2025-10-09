@@ -99,31 +99,14 @@ async function saveZipToSupabase(file: File, category: string, brand: string) {
       // Storage path: html5-ads/category/brand/foldername/filename
       const storagePath = `html5-ads/${category}/${brand}/${folderName}/${fileName}`;
       
-      // Determine content type based on file extension
-      let contentType = 'application/octet-stream';
-      if (fileName.endsWith('.html')) {
-        contentType = 'text/html';
-      } else if (fileName.endsWith('.css')) {
-        contentType = 'text/css';
-      } else if (fileName.endsWith('.js')) {
-        contentType = 'application/javascript';
-      } else if (fileName.endsWith('.json')) {
-        contentType = 'application/json';
-      } else if (fileName.endsWith('.png')) {
-        contentType = 'image/png';
-      } else if (fileName.endsWith('.jpg') || fileName.endsWith('.jpeg')) {
-        contentType = 'image/jpeg';
-      } else if (fileName.endsWith('.gif')) {
-        contentType = 'image/gif';
-      } else if (fileName.endsWith('.svg')) {
-        contentType = 'image/svg+xml';
-      } else if (fileName.endsWith('.webp')) {
-        contentType = 'image/webp';
-      }
+      // CRITICAL: Use application/octet-stream for ALL files
+      // This bypasses Supabase bucket MIME type restrictions
+      // Browser will still interpret files correctly based on URL extension
+      const contentType = 'application/octet-stream';
 
-      // Upload file to Supabase
+      // Upload file to Supabase - use dedicated html5-mastheads bucket
       const { error } = await supabaseAdmin.storage
-        .from('appective-files')
+        .from('html5-mastheads')
         .upload(storagePath, fileData, {
           contentType,
           upsert: true,
@@ -151,7 +134,7 @@ async function saveZipToSupabase(file: File, category: string, brand: string) {
     // Get public URL for index.html
     const indexPath = `html5-ads/${category}/${brand}/${folderName}/index.html`;
     const { data: { publicUrl } } = supabaseAdmin.storage
-      .from('appective-files')
+      .from('html5-mastheads')
       .getPublicUrl(indexPath);
 
     console.log('ZIP extracted and uploaded successfully:', { 

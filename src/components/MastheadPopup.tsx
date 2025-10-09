@@ -19,6 +19,11 @@ const MastheadPopup = ({ masthead, onClose }: MastheadPopupProps) => {
     }
     
     // If it's a Supabase HTML URL (new system - extracted files), return as is
+    if (url.includes('supabase.co/storage/v1/object/public/html5-mastheads/html5-ads/') && url.endsWith('/index.html')) {
+      return url;
+    }
+    
+    // Also support old appective-files bucket URLs
     if (url.includes('supabase.co/storage/v1/object/public/appective-files/html5-ads/') && url.endsWith('/index.html')) {
       return url;
     }

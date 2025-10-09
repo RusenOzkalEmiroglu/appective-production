@@ -104,9 +104,9 @@ async function saveZipToSupabase(file: File, category: string, brand: string) {
       // Browser will still interpret files correctly based on URL extension
       const contentType = 'application/octet-stream';
 
-      // Upload file to Supabase - use dedicated html5-mastheads bucket
+      // Upload file to Supabase - use appective-files bucket
       const { error } = await supabaseAdmin.storage
-        .from('html5-mastheads')
+        .from('appective-files')
         .upload(storagePath, fileData, {
           contentType,
           upsert: true,
@@ -134,7 +134,7 @@ async function saveZipToSupabase(file: File, category: string, brand: string) {
     // Get public URL for index.html
     const indexPath = `html5-ads/${category}/${brand}/${folderName}/index.html`;
     const { data: { publicUrl } } = supabaseAdmin.storage
-      .from('html5-mastheads')
+      .from('appective-files')
       .getPublicUrl(indexPath);
 
     console.log('ZIP extracted and uploaded successfully:', { 

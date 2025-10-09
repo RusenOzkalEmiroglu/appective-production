@@ -67,6 +67,8 @@ Admin panelinde ZIP dosyası upload edebilmek için Supabase bucket'ınızı yap
 - File size limit: 50MB
 - Allowed MIME types: Yukarıdaki listede belirtilenler
 
+**NOT:** Tüm dosyalar (resimler ve ZIP dosyaları) tek bucket (`appective-files`) içinde saklanır.
+
 6. Geliştirme sunucusunu başlatın:
 ```bash
 npm run dev

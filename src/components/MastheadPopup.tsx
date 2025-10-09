@@ -13,12 +13,17 @@ interface MastheadPopupProps {
 const MastheadPopup = ({ masthead, onClose }: MastheadPopupProps) => {
   // Function to convert zip URLs to HTML paths
   const convertZipUrlToHtmlPath = (url: string): string => {
-    // If it's already a local HTML path, return as is
+    // If it's already a Supabase HTML URL (new system), return as is
+    if (url.includes('supabase.co/storage/v1/object/public/appective-files/zips/interactive-mastheads/') && url.endsWith('/index.html')) {
+      return url;
+    }
+    
+    // If it's a local HTML path (old system), return as is
     if (url.startsWith('/interactive_mastheads_zips/') && url.endsWith('/index.html')) {
       return url;
     }
     
-    // If it's a Supabase zip URL, convert to local HTML path
+    // If it's an old Supabase zip URL, convert to local HTML path
     if (url.includes('supabase.co/storage/v1/object/public/appective-files/interactive_mastheads_zips/') && url.endsWith('.zip')) {
       // Extract the path from the URL
       const urlParts = url.split('/interactive_mastheads_zips/')[1];

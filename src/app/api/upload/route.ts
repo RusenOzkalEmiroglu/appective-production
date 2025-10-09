@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
+import AdmZip from 'adm-zip';
 import { withAdminAuthSimple } from '@/lib/withAdminAuth';
 
 // Force dynamic rendering to avoid Vercel Edge Cache
@@ -66,41 +67,103 @@ async function saveZipToSupabase(file: File, category: string, brand: string) {
   const buffer = Buffer.from(bytes);
 
   const hash = generateHash(12);
-  const zipFileName = `popup-html5-${hash}.zip`;
+  const folderName = `popup-html5-${hash}`;
   
-  // Storage path: zips/interactive-mastheads/category/brand/filename.zip
-  const storagePath = `zips/interactive-mastheads/${category}/${brand}/${zipFileName}`;
-  
-  console.log('Uploading ZIP to Supabase Storage:', storagePath);
+  console.log('Extracting ZIP and uploading files to Supabase Storage...');
 
-  // Upload ZIP file to Supabase Storage
-  const { data, error } = await supabaseAdmin.storage
-    .from('appective-files')
-    .upload(storagePath, buffer, {
-      contentType: 'application/zip',
-      upsert: true
+  try {
+    // Extract ZIP in memory
+    const zip = new AdmZip(buffer);
+    const zipEntries = zip.getEntries();
+    
+    console.log(`Found ${zipEntries.length} files in ZIP`);
+    
+    let indexHtmlFound = false;
+    const uploadedFiles: string[] = [];
+
+    // Upload each file from the ZIP to Supabase Storage
+    for (const entry of zipEntries) {
+      // Skip directories and system files
+      if (entry.isDirectory || entry.entryName.startsWith('__MACOSX') || entry.entryName.startsWith('.')) {
+        continue;
+      }
+
+      const fileName = entry.entryName;
+      const fileData = entry.getData();
+      
+      // Storage path: zips/interactive-mastheads/category/brand/foldername/filename
+      const storagePath = `zips/interactive-mastheads/${category}/${brand}/${folderName}/${fileName}`;
+      
+      // Determine content type based on file extension
+      let contentType = 'application/octet-stream';
+      if (fileName.endsWith('.html')) {
+        contentType = 'text/html';
+        if (fileName.toLowerCase() === 'index.html') {
+          indexHtmlFound = true;
+        }
+      } else if (fileName.endsWith('.css')) {
+        contentType = 'text/css';
+      } else if (fileName.endsWith('.js')) {
+        contentType = 'application/javascript';
+      } else if (fileName.endsWith('.jpg') || fileName.endsWith('.jpeg')) {
+        contentType = 'image/jpeg';
+      } else if (fileName.endsWith('.png')) {
+        contentType = 'image/png';
+      } else if (fileName.endsWith('.gif')) {
+        contentType = 'image/gif';
+      } else if (fileName.endsWith('.svg')) {
+        contentType = 'image/svg+xml';
+      }
+
+      // Upload file to Supabase
+      const { error } = await supabaseAdmin.storage
+        .from('appective-files')
+        .upload(storagePath, fileData, {
+          contentType,
+          upsert: true
+        });
+
+      if (error) {
+        console.error(`Error uploading ${fileName}:`, error);
+        throw new Error(`Failed to upload ${fileName}: ${error.message}`);
+      }
+
+      uploadedFiles.push(storagePath);
+      console.log(`Uploaded: ${storagePath}`);
+    }
+
+    if (!indexHtmlFound) {
+      // If no index.html, look for any HTML file and use it
+      const htmlFile = uploadedFiles.find(f => f.endsWith('.html'));
+      if (!htmlFile) {
+        throw new Error('No HTML file found in ZIP archive');
+      }
+      console.log('Warning: No index.html found, using first HTML file:', htmlFile);
+    }
+
+    // Get public URL for index.html
+    const indexPath = `zips/interactive-mastheads/${category}/${brand}/${folderName}/index.html`;
+    const { data: { publicUrl } } = supabaseAdmin.storage
+      .from('appective-files')
+      .getPublicUrl(indexPath);
+
+    console.log('ZIP extracted and uploaded successfully:', { 
+      folder: folderName, 
+      filesUploaded: uploadedFiles.length,
+      indexUrl: publicUrl 
     });
-
-  if (error) {
-    console.error('Supabase storage error:', error);
-    throw new Error(`Storage upload failed: ${error.message}`);
+    
+    return { 
+      filePath: publicUrl,
+      htmlUrl: publicUrl,
+      folder: folderName,
+      filesCount: uploadedFiles.length
+    };
+    
+  } catch (error: any) {
+    console.error('Error extracting ZIP:', error);
+    throw new Error(`ZIP extraction failed: ${error?.message || 'Unknown error'}`);
   }
-
-  // Get public URL for the ZIP file
-  const { data: { publicUrl } } = supabaseAdmin.storage
-    .from('appective-files')
-    .getPublicUrl(storagePath);
-
-  console.log('ZIP uploaded successfully:', { storagePath, publicUrl });
-  
-  // Return the ZIP file URL - client can download and extract if needed
-  return { 
-    filePath: publicUrl,
-    zipUrl: publicUrl,
-    category,
-    brand,
-    fileName: zipFileName
-  };
 }
 
 async function postHandler(request: NextRequest) {

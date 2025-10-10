@@ -33,7 +33,19 @@ const MastheadPopup = ({ masthead, onClose }: MastheadPopupProps) => {
         });
       }
     }
-  }, [masthead, checkFileExists]);
+  }, [masthead]);
+
+  // Check if HTML file exists before loading iframe
+  const checkFileExists = useCallback(async (filePath: string) => {
+    try {
+      const response = await fetch(`/api/check-masthead-file?path=${encodeURIComponent(filePath)}`);
+      const data = await response.json();
+      return data.exists;
+    } catch (error) {
+      console.error('File check error:', error);
+      return false;
+    }
+  }, []);
 
   // Function to convert zip URLs to HTML paths
   const convertZipUrlToHtmlPath = (url: string): string => {
@@ -75,18 +87,6 @@ const MastheadPopup = ({ masthead, onClose }: MastheadPopupProps) => {
     setIframeError(true);
     console.error('Iframe yükleme hatası:', convertZipUrlToHtmlPath(masthead?.popupHtmlPath || ''));
   }, [masthead?.popupHtmlPath]);
-
-  // Check if HTML file exists before loading iframe
-  const checkFileExists = useCallback(async (filePath: string) => {
-    try {
-      const response = await fetch(`/api/check-masthead-file?path=${encodeURIComponent(filePath)}`);
-      const data = await response.json();
-      return data.exists;
-    } catch (error) {
-      console.error('File check error:', error);
-      return false;
-    }
-  }, []);
 
   const dimensions = useMemo(() => {
     if (!masthead?.bannerDetails.size) return { width: 'auto', height: 'auto' };

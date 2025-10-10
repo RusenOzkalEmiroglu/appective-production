@@ -72,7 +72,7 @@ async function postHandler(request: NextRequest) {
     let errors: string[] = [];
 
     // Recursive function to process all files
-    async function processFolder(prefix: string) {
+    const processFolder = async (prefix: string) => {
       const { data: items, error } = await supabaseAdmin.storage
         .from('appective-files')
         .list(prefix, {

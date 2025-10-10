@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rich Media Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .container {
+            text-align: center;
+            max-width: 800px;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .status {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+        }
+        .success {
+            color: #4ade80;
+            font-weight: bold;
+        }
+        .error {
+            color: #f87171;
+            font-weight: bold;
+        }
+        .info {
+            color: #60a5fa;
+        }
+        button {
+            background: #8A2BE2;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #6A0DAD;
+        }
+        .test-results {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .test-item {
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #8A2BE2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Rich Media Test Sayfası</h1>
+        
+        <div class="status">
+            <h2>Test Durumu</h2>
+            <div id="status">Test başlatılıyor...</div>
+        </div>
+
+        <div>
+            <button onclick="testCSP()">CSP Test Et</button>
+            <button onclick="testFileCheck()">Dosya Kontrol Test Et</button>
+            <button onclick="testIframe()">Iframe Test Et</button>
+        </div>
+
+        <div class="test-results" id="testResults"></div>
+    </div>
+
+    <script>
+        let testResults = [];
+
+        function addTestResult(testName, status, message) {
+            const result = {
+                name: testName,
+                status: status,
+                message: message,
+                timestamp: new Date().toLocaleTimeString()
+            };
+            testResults.push(result);
+            updateResultsDisplay();
+        }
+
+        function updateResultsDisplay() {
+            const container = document.getElementById('testResults');
+            container.innerHTML = testResults.map(result => `
+                <div class="test-item">
+                    <div class="${result.status}">
+                        ${result.status === 'success' ? '✅' : result.status === 'error' ? '❌' : 'ℹ️'} 
+                        ${result.name} - ${result.timestamp}
+                    </div>
+                    <div class="info">${result.message}</div>
+                </div>
+            `).join('');
+        }
+
+        function testCSP() {
+            addTestResult('CSP Test', 'info', 'Content Security Policy kontrol ediliyor...');
+            
+            try {
+                // Inline style test
+                const testDiv = document.createElement('div');
+                testDiv.style.backgroundColor = 'red';
+                testDiv.style.display = 'none';
+                document.body.appendChild(testDiv);
+                document.body.removeChild(testDiv);
+                
+                addTestResult('CSP Test', 'success', 'Inline style çalışıyor - CSP düzgün yapılandırılmış');
+            } catch (error) {
+                addTestResult('CSP Test', 'error', 'CSP hatası: ' + error.message);
+            }
+        }
+
+        async function testFileCheck() {
+            addTestResult('Dosya Kontrol Test', 'info', 'API endpoint test ediliyor...');
+            
+            try {
+                const response = await fetch('/api/check-masthead-file?path=/interactive_mastheads_zips/home/english-home/popup-html5-a21876e056df/index.html');
+                const data = await response.json();
+                
+                if (data.exists) {
+                    addTestResult('Dosya Kontrol Test', 'success', `Dosya bulundu: ${data.path}`);
+                } else {
+                    addTestResult('Dosya Kontrol Test', 'error', `Dosya bulunamadı: ${data.path}`);
+                }
+            } catch (error) {
+                addTestResult('Dosya Kontrol Test', 'error', 'API hatası: ' + error.message);
+            }
+        }
+
+        function testIframe() {
+            addTestResult('Iframe Test', 'info', 'Iframe oluşturuluyor...');
+            
+            try {
+                const iframe = document.createElement('iframe');
+                iframe.src = '/interactive_mastheads_zips/home/english-home/popup-html5-a21876e056df/index.html';
+                iframe.style.width = '300px';
+                iframe.style.height = '200px';
+                iframe.style.border = '2px solid #8A2BE2';
+                iframe.style.borderRadius = '8px';
+                
+                iframe.onload = () => {
+                    addTestResult('Iframe Test', 'success', 'Iframe başarıyla yüklendi');
+                };
+                
+                iframe.onerror = () => {
+                    addTestResult('Iframe Test', 'error', 'Iframe yüklenemedi');
+                };
+                
+                document.body.appendChild(iframe);
+                
+                // 5 saniye sonra iframe'i kaldır
+                setTimeout(() => {
+                    if (document.body.contains(iframe)) {
+                        document.body.removeChild(iframe);
+                    }
+                }, 5000);
+                
+            } catch (error) {
+                addTestResult('Iframe Test', 'error', 'Iframe oluşturma hatası: ' + error.message);
+            }
+        }
+
+        // Sayfa yüklendiğinde otomatik test
+        window.onload = () => {
+            document.getElementById('status').innerHTML = '<span class="success">✅ Test sayfası hazır</span>';
+            addTestResult('Sayfa Yükleme', 'success', 'Test sayfası başarıyla yüklendi');
+        };
+    </script>
+</body>
+</html>

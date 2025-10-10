@@ -7,17 +7,17 @@ export function middleware(request: NextRequest) {
   // CSP ayarları - iframe içindeki HTML5 reklamlar için
   const cspHeader = `
     default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http:;
-    style-src 'self' 'unsafe-inline' https: http:;
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http: blob:;
+    style-src 'self' 'unsafe-inline' https: http: blob:;
     img-src 'self' data: blob: https: http:;
     font-src 'self' data: https: http:;
     object-src 'none';
     base-uri 'self';
     form-action 'self';
     frame-ancestors 'self';
-    frame-src 'self' https: http:;
+    frame-src 'self' https: http: blob:;
     connect-src 'self' https: http: wss: ws:;
-    media-src 'self' https: http:;
+    media-src 'self' https: http: blob:;
     worker-src 'self' blob:;
     child-src 'self' blob: https: http:;
   `.replace(/\s{2,}/g, ' ').trim();

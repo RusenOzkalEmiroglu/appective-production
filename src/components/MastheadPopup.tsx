@@ -3,7 +3,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { MastheadItem } from '@/data/interactiveMastheadsData';
-import { useMemo } from 'react';
+import { useMemo, useState, useCallback } from 'react';
+import React from 'react';
 
 interface MastheadPopupProps {
   masthead: MastheadItem | null;
@@ -11,6 +12,29 @@ interface MastheadPopupProps {
 }
 
 const MastheadPopup = ({ masthead, onClose }: MastheadPopupProps) => {
+  const [iframeError, setIframeError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Reset states when masthead changes and check file existence
+  React.useEffect(() => {
+    if (masthead) {
+      setIsLoading(true);
+      setIframeError(false);
+      
+      // Check if the HTML file exists
+      const htmlPath = convertZipUrlToHtmlPath(masthead.popupHtmlPath);
+      if (htmlPath.startsWith('/interactive_mastheads_zips/')) {
+        checkFileExists(htmlPath).then(exists => {
+          if (!exists) {
+            setIsLoading(false);
+            setIframeError(true);
+            console.error('HTML dosyası bulunamadı:', htmlPath);
+          }
+        });
+      }
+    }
+  }, [masthead, checkFileExists]);
+
   // Function to convert zip URLs to HTML paths
   const convertZipUrlToHtmlPath = (url: string): string => {
     // If it's a local HTML path (old working system), return as is
@@ -40,6 +64,29 @@ const MastheadPopup = ({ masthead, onClose }: MastheadPopupProps) => {
     // Return original URL if no conversion needed
     return url;
   };
+
+  const handleIframeLoad = useCallback(() => {
+    setIsLoading(false);
+    setIframeError(false);
+  }, []);
+
+  const handleIframeError = useCallback(() => {
+    setIsLoading(false);
+    setIframeError(true);
+    console.error('Iframe yükleme hatası:', convertZipUrlToHtmlPath(masthead?.popupHtmlPath || ''));
+  }, [masthead?.popupHtmlPath]);
+
+  // Check if HTML file exists before loading iframe
+  const checkFileExists = useCallback(async (filePath: string) => {
+    try {
+      const response = await fetch(`/api/check-masthead-file?path=${encodeURIComponent(filePath)}`);
+      const data = await response.json();
+      return data.exists;
+    } catch (error) {
+      console.error('File check error:', error);
+      return false;
+    }
+  }, []);
 
   const dimensions = useMemo(() => {
     if (!masthead?.bannerDetails.size) return { width: 'auto', height: 'auto' };
@@ -118,7 +165,7 @@ const MastheadPopup = ({ masthead, onClose }: MastheadPopupProps) => {
             </div>
 
             <div 
-              className="my-6 mx-auto border-0 rounded-lg overflow-hidden flex items-center justify-center"
+              className="my-6 mx-auto border-0 rounded-lg overflow-hidden flex items-center justify-center relative"
               style={{
                 width: (dimensions as any).isFullPage ? '90vw' : `${dimensions.width}px`,
                 height: (dimensions as any).isFullPage ? '80vh' : `${dimensions.height}px`,
@@ -126,19 +173,55 @@ const MastheadPopup = ({ masthead, onClose }: MastheadPopupProps) => {
                 maxHeight: '90vh'
               }}
             >
+              {/* Loading indicator */}
+              {isLoading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
+                  <div className="text-white text-lg">Yükleniyor...</div>
+                </div>
+              )}
+              
+              {/* Error message */}
+              {iframeError && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/80 z-10">
+                  <div className="text-center text-white p-4 max-w-md">
+                    <div className="text-red-400 text-lg mb-2">⚠️ İçerik yüklenemedi</div>
+                    <div className="text-sm text-white/70 mb-2">
+                      <div className="mb-1">Dosya yolu:</div>
+                      <div className="font-mono text-xs break-all bg-black/50 p-2 rounded">
+                        {convertZipUrlToHtmlPath(masthead?.popupHtmlPath || '')}
+                      </div>
+                    </div>
+                    <div className="text-xs text-white/50 mb-4">
+                      Bu dosya sunucuda bulunamadı. Lütfen admin panelinden dosya yolunu kontrol edin.
+                    </div>
+                    <button 
+                      onClick={() => {
+                        setIsLoading(true);
+                        setIframeError(false);
+                      }}
+                      className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded text-white text-sm"
+                    >
+                      Tekrar Dene
+                    </button>
+                  </div>
+                </div>
+              )}
+              
               <iframe
                 src={convertZipUrlToHtmlPath(masthead.popupHtmlPath)}
                 width={(dimensions as any).isFullPage ? '100%' : dimensions.width}
                 height={(dimensions as any).isFullPage ? '100%' : dimensions.height}
                 frameBorder="0"
                 scrolling={(dimensions as any).isFullPage ? "auto" : "no"}
-                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads"
                 allow="autoplay; fullscreen; picture-in-picture"
                 style={{ 
                   display: 'block',
                   width: (dimensions as any).isFullPage ? '100%' : `${dimensions.width}px`,
                   height: (dimensions as any).isFullPage ? '100%' : `${dimensions.height}px`
                 }}
+                onLoad={handleIframeLoad}
+                onError={handleIframeError}
               />
             </div>
 

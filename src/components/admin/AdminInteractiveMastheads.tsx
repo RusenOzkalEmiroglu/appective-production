@@ -24,6 +24,7 @@ const AdminInteractiveMastheadsPage = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingItem, setEditingItem] = useState<MastheadItem | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<{[key: string]: any}>({});
   
   // Filter states
   const [selectedCategory, setSelectedCategory] = useState('ALL');
@@ -198,6 +199,33 @@ const AdminInteractiveMastheadsPage = () => {
     }
   };
 
+  const debugMastheadFile = async (masthead: MastheadItem) => {
+    try {
+      const response = await fetch(`/api/check-masthead-file?path=${encodeURIComponent(masthead.popupHtmlPath)}`);
+      const data = await response.json();
+      
+      setDebugInfo(prev => ({
+        ...prev,
+        [masthead.id]: {
+          originalPath: masthead.popupHtmlPath,
+          exists: data.exists,
+          checkedAt: new Date().toLocaleTimeString()
+        }
+      }));
+    } catch (error) {
+      console.error('Debug error:', error);
+      setDebugInfo(prev => ({
+        ...prev,
+        [masthead.id]: {
+          originalPath: masthead.popupHtmlPath,
+          exists: false,
+          error: 'API hatası',
+          checkedAt: new Date().toLocaleTimeString()
+        }
+      }));
+    }
+  };
+
   const handleDeleteItem = async (itemId: string) => {
     if (window.confirm('Bu masthead öğesini silmek istediğinizden emin misiniz? Bu değişiklik kalıcı olacaktır.')) {
       try {
@@ -313,9 +341,16 @@ const AdminInteractiveMastheadsPage = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <button 
                         onClick={() => openEditForm(masthead)} 
-                        className="text-purple-400 hover:text-purple-300 mr-4"
+                        className="text-purple-400 hover:text-purple-300 mr-2"
                       >
                         Edit
+                      </button>
+                      <button 
+                        onClick={() => debugMastheadFile(masthead)} 
+                        className="text-blue-400 hover:text-blue-300 mr-2"
+                        title="Dosya varlığını kontrol et"
+                      >
+                        Debug
                       </button>
                       <button 
                         onClick={() => handleDeleteItem(masthead.id)} 
@@ -331,6 +366,36 @@ const AdminInteractiveMastheadsPage = () => {
           </div>
         )}
       </div>
+      
+      {/* Debug Panel */}
+      {Object.keys(debugInfo).length > 0 && (
+        <div className="mt-8 p-4 bg-gray-800 rounded-lg">
+          <h3 className="text-lg font-semibold text-white mb-4">🔍 Debug Bilgileri</h3>
+          <div className="space-y-2">
+            {Object.entries(debugInfo).map(([id, info]) => (
+              <div key={id} className="p-3 bg-gray-700 rounded">
+                <div className="flex items-center justify-between">
+                  <span className="text-white font-medium">ID: {id}</span>
+                  <span className={`text-sm ${info.exists ? 'text-green-400' : 'text-red-400'}`}>
+                    {info.exists ? '✅ Dosya mevcut' : '❌ Dosya bulunamadı'}
+                  </span>
+                </div>
+                <div className="text-sm text-gray-300 mt-1">
+                  <div>Yol: <code className="bg-black/50 px-2 py-1 rounded">{info.originalPath}</code></div>
+                  <div>Kontrol zamanı: {info.checkedAt}</div>
+                  {info.error && <div className="text-red-400">Hata: {info.error}</div>}
+                </div>
+              </div>
+            ))}
+          </div>
+          <button 
+            onClick={() => setDebugInfo({})}
+            className="mt-4 px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded"
+          >
+            Debug Bilgilerini Temizle
+          </button>
+        </div>
+      )}
       
       {/* Form Modal */}
       {showForm && (

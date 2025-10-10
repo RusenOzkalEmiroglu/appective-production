@@ -49,18 +49,23 @@ const MastheadPopup = ({ masthead, onClose }: MastheadPopupProps) => {
 
   // Function to convert zip URLs to HTML paths
   const convertZipUrlToHtmlPath = (url: string): string => {
+    console.log('Converting URL:', url);
+    
     // If it's a local HTML path (old working system), return as is
     if (url.startsWith('/interactive_mastheads_zips/') && url.endsWith('/index.html')) {
+      console.log('Local HTML path detected:', url);
       return url;
     }
     
     // If it's a Supabase HTML URL (new system - extracted files), return as is
     if (url.includes('supabase.co/storage/v1/object/public/html5-mastheads/html5-ads/') && url.endsWith('/index.html')) {
+      console.log('Supabase HTML5-mastheads URL detected:', url);
       return url;
     }
     
-    // Also support old appective-files bucket URLs
+    // Also support old appective-files bucket URLs (NEW SYSTEM)
     if (url.includes('supabase.co/storage/v1/object/public/appective-files/html5-ads/') && url.endsWith('/index.html')) {
+      console.log('Supabase appective-files html5-ads URL detected:', url);
       return url;
     }
     
@@ -69,11 +74,14 @@ const MastheadPopup = ({ masthead, onClose }: MastheadPopupProps) => {
       const urlParts = url.split('/interactive_mastheads_zips/')[1];
       if (urlParts) {
         const zipPath = urlParts.replace('.zip', '');
-        return `/interactive_mastheads_zips/${zipPath}/index.html`;
+        const localPath = `/interactive_mastheads_zips/${zipPath}/index.html`;
+        console.log('Converted old zip URL to local path:', localPath);
+        return localPath;
       }
     }
     
     // Return original URL if no conversion needed
+    console.log('No conversion needed, returning original URL:', url);
     return url;
   };
 
@@ -213,12 +221,13 @@ const MastheadPopup = ({ masthead, onClose }: MastheadPopupProps) => {
                 height={(dimensions as any).isFullPage ? '100%' : dimensions.height}
                 frameBorder="0"
                 scrolling={(dimensions as any).isFullPage ? "auto" : "no"}
-                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads"
-                allow="autoplay; fullscreen; picture-in-picture"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads allow-top-navigation-by-user-activation"
+                allow="autoplay; fullscreen; picture-in-picture; microphone; camera"
                 style={{ 
                   display: 'block',
                   width: (dimensions as any).isFullPage ? '100%' : `${dimensions.width}px`,
-                  height: (dimensions as any).isFullPage ? '100%' : `${dimensions.height}px`
+                  height: (dimensions as any).isFullPage ? '100%' : `${dimensions.height}px`,
+                  border: 'none'
                 }}
                 onLoad={handleIframeLoad}
                 onError={handleIframeError}

@@ -7,19 +7,19 @@ export function middleware(request: NextRequest) {
   // CSP ayarları - iframe içindeki HTML5 reklamlar için
   const cspHeader = `
     default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http: blob:;
-    style-src 'self' 'unsafe-inline' https: http: blob:;
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http: blob: data:;
+    style-src 'self' 'unsafe-inline' https: http: blob: data:;
     img-src 'self' data: blob: https: http:;
     font-src 'self' data: https: http:;
     object-src 'none';
     base-uri 'self';
     form-action 'self';
     frame-ancestors 'self';
-    frame-src 'self' https: http: blob:;
+    frame-src 'self' https: http: blob: data:;
     connect-src 'self' https: http: wss: ws:;
-    media-src 'self' https: http: blob:;
+    media-src 'self' https: http: blob: data:;
     worker-src 'self' blob:;
-    child-src 'self' blob: https: http:;
+    child-src 'self' blob: https: http: data:;
   `.replace(/\s{2,}/g, ' ').trim();
 
   response.headers.set('Content-Security-Policy', cspHeader);

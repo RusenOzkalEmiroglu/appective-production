@@ -4,6 +4,15 @@ import { Inter, Montserrat } from 'next/font/google';
 import Footer from '@/components/Footer';
 import { getSocialLinks } from '@/lib/data';
 
+export const metadata = {
+  title: 'Site Adı',
+  description: 'Açıklama',
+  verification: {
+    google: 'google-site-verification" content="iUD7xyxj2u9QT',
+  },
+}
+
+
 const inter = Inter({
   subsets: ['latin'],
   display: 'swap',

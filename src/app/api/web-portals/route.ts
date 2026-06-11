@@ -1,6 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { WebPortalItem } from '@/data/webPortalsData';
 import { supabase } from '@/lib/supabase';
+import { assertSupabaseAdmin } from '@/lib/supabaseAdmin';
+import { withAdminAuthSimple } from '@/lib/withAdminAuth';
 
 // Force dynamic rendering to avoid Vercel Edge Cache
 export const dynamic = 'force-dynamic';
@@ -34,13 +36,14 @@ export async function GET() {
   }
 }
 
-export async function POST(request: Request) {
+async function postHandler(request: NextRequest) {
   try {
     const body = await request.json();
-    
+    const admin = assertSupabaseAdmin();
+
     if (Array.isArray(body)) {
       // Bulk update - replace all data
-      const { error: deleteError } = await supabase
+      const { error: deleteError } = await admin
         .from('web_portals')
         .delete()
         .neq('id', '');
@@ -58,7 +61,7 @@ export async function POST(request: Request) {
         project_url: item.projectUrl || null
       }));
 
-      const { error: insertError } = await supabase
+      const { error: insertError } = await admin
         .from('web_portals')
         .insert(transformedData);
 
@@ -79,7 +82,7 @@ export async function POST(request: Request) {
         project_url: item.projectUrl || null
       };
 
-      const { error } = await supabase
+      const { error } = await admin
         .from('web_portals')
         .upsert(transformedItem);
 
@@ -95,7 +98,7 @@ export async function POST(request: Request) {
   }
 }
 
-export async function DELETE(request: Request) {
+async function deleteHandler(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
@@ -104,7 +107,8 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ message: 'ID is required' }, { status: 400 });
     }
 
-    const { error } = await supabase
+    const admin = assertSupabaseAdmin();
+    const { error } = await admin
       .from('web_portals')
       .delete()
       .eq('id', id);
@@ -119,3 +123,6 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ message: 'Error deleting data', error: (error as Error).message }, { status: 500 });
   }
 }
+
+export const POST = withAdminAuthSimple(postHandler);
+export const DELETE = withAdminAuthSimple(deleteHandler);

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { assertSupabaseAdmin } from '@/lib/supabaseAdmin';
 import { withAdminAuthSimple } from '@/lib/withAdminAuth';
 
 // --- Public Handlers ---
@@ -35,29 +36,45 @@ export async function GET() {
 // --- Protected Handlers ---
 
 // POST handler for updating banner data in Supabase
+// Accepts either:
+//   - JSON body: { background_image, button_link } (used by AdminTopBannerManagement after image upload)
+//   - FormData body: { file?, targetUrl } (legacy formData path; file is used to build a local path only)
 async function postHandler(request: NextRequest) {
   try {
-    const formData = await request.formData();
-    const file = formData.get('file') as File | null;
-    const targetUrl = formData.get('targetUrl') as string;
+    const admin = assertSupabaseAdmin();
 
-    // Get current data
-    const { data: currentData } = await supabase
-      .from('top_banner')
-      .select('background_image')
-      .eq('id', 1)
-      .maybeSingle();
+    let imageUrl: string | null = null;
+    let targetUrl: string = '';
 
-    let imageUrl = currentData?.background_image || null;
+    const contentType = request.headers.get('content-type') || '';
 
-    if (file) {
-      // For now, we'll use a simple filename approach
-      // In production, you might want to use a proper file upload service
-      const uniqueFilename = `${Date.now()}-${file.name}`;
-      imageUrl = `/images/banner/${uniqueFilename}`;
+    if (contentType.includes('application/json')) {
+      // JSON path: component already uploaded the image and sends the final URL
+      const body = await request.json();
+      imageUrl = body.background_image ?? null;
+      targetUrl = body.button_link ?? '';
+    } else {
+      // FormData path (legacy)
+      const formData = await request.formData();
+      const file = formData.get('file') as File | null;
+      targetUrl = (formData.get('targetUrl') as string) || '';
+
+      // Get current data (read via anon is fine)
+      const { data: currentData } = await supabase
+        .from('top_banner')
+        .select('background_image')
+        .eq('id', 1)
+        .maybeSingle();
+
+      imageUrl = currentData?.background_image || null;
+
+      if (file) {
+        const uniqueFilename = `${Date.now()}-${file.name}`;
+        imageUrl = `/images/banner/${uniqueFilename}`;
+      }
     }
 
-    // Update or insert banner data
+    // Update or insert banner data via service-role
     const updateData = {
       background_image: imageUrl,
       button_link: targetUrl
@@ -71,14 +88,14 @@ async function postHandler(request: NextRequest) {
 
     let result;
     if (existingRecord) {
-      // Update existing record
-      result = await supabase
+      // Update existing record via admin client
+      result = await admin
         .from('top_banner')
         .update(updateData)
         .eq('id', 1)
         .select();
     } else {
-      // Insert new record
+      // Insert new record via admin client
       const insertData = {
         id: 1,
         title: 'Welcome to Appective',
@@ -87,7 +104,7 @@ async function postHandler(request: NextRequest) {
         button_text: 'Get Started',
         ...updateData
       };
-      result = await supabase
+      result = await admin
         .from('top_banner')
         .insert(insertData)
         .select();
@@ -107,7 +124,8 @@ async function postHandler(request: NextRequest) {
 // DELETE handler for removing banner from Supabase
 async function deleteHandler(request: NextRequest) {
   try {
-    const { error } = await supabase
+    const admin = assertSupabaseAdmin();
+    const { error } = await admin
       .from('top_banner')
       .update({ background_image: null, button_link: null })
       .eq('id', 1);

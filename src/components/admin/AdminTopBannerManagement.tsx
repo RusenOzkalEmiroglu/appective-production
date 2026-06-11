@@ -125,18 +125,18 @@ const AdminTopBannerManagement: FC = () => {
       if (modalContent.action === 'save') {
         // Resim yükleme işlemi
         let imageUrl = currentBanner?.src || '';
-        
+
         if (newImage) {
           // Resmi public/images/banner klasörüne kaydet
           const formData = new FormData();
           formData.append('file', newImage);
-          
+
           try {
             const uploadResponse = await fetchWithAuth('/api/upload-banner', {
               method: 'POST',
               body: formData,
             });
-            
+
             if (uploadResponse.ok) {
               const result = await uploadResponse.json();
               imageUrl = result.url;
@@ -151,61 +151,32 @@ const AdminTopBannerManagement: FC = () => {
           }
         }
 
-        // Supabase'i güncelle
-        const updateData = {
-          button_link: targetUrl,
-          background_image: imageUrl
-        };
+        // Route API üzerinden service-role ile güncelle (anon write yok)
+        console.log('Updating banner via API:', { background_image: imageUrl, button_link: targetUrl }); // Debug
 
-        console.log('Updating with data:', updateData); // Debug
+        const saveResponse = await fetchWithAuth('/api/top-banner', {
+          method: 'POST',
+          body: JSON.stringify({ background_image: imageUrl, button_link: targetUrl }),
+        });
 
-        // Önce kayıt var mı kontrol et
-        const { data: existingRecord } = await supabase
-          .from('top_banner')
-          .select('id')
-          .eq('id', 1)
-          .maybeSingle();
+        console.log('Save response status:', saveResponse.status); // Debug
 
-        let result;
-        if (existingRecord) {
-          // Kayıt varsa güncelle
-          result = await supabase
-            .from('top_banner')
-            .update(updateData)
-            .eq('id', 1)
-            .select();
-        } else {
-          // Kayıt yoksa oluştur
-          const insertData = {
-            id: 1,
-            title: 'Welcome to Appective',
-            subtitle: 'Digital Marketing & Development',
-            description: 'We create innovative digital solutions for your business',
-            button_text: 'Get Started',
-            ...updateData
-          };
-          result = await supabase
-            .from('top_banner')
-            .insert(insertData)
-            .select();
-        }
-        
-        console.log('Save result:', result); // Debug
-        
-        if (result.error) {
-          console.error('Save error:', result.error);
-          throw result.error;
+        if (!saveResponse.ok) {
+          const errorData = await saveResponse.json();
+          throw new Error(errorData.error || errorData.details || 'Banner güncellenemedi');
         }
 
         success = true;
         showFeedback('success', 'Banner başarıyla güncellendi!');
       } else if (modalContent.action === 'delete') {
-        const { error } = await supabase
-          .from('top_banner')
-          .update({ background_image: null })
-          .eq('id', 1);
-        
-        if (error) throw error;
+        // Route API üzerinden service-role ile sil (anon write yok)
+        const deleteResponse = await fetchWithAuth('/api/top-banner', { method: 'DELETE' });
+
+        if (!deleteResponse.ok) {
+          const errorData = await deleteResponse.json();
+          throw new Error(errorData.error || errorData.details || 'Banner silinemedi');
+        }
+
         success = true;
         showFeedback('success', 'Banner başarıyla silindi!');
       }

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase, TeamMember } from '@/lib/supabase';
+import { assertSupabaseAdmin } from '@/lib/supabaseAdmin';
+import { withAdminAuthSimple } from '@/lib/withAdminAuth';
 
 // Force dynamic rendering to avoid Vercel Edge Cache
 export const dynamic = 'force-dynamic';
@@ -25,13 +27,13 @@ export async function GET() {
   }
 }
 
-export async function POST(request: NextRequest) {
+async function postHandler(request: NextRequest) {
   try {
     const body = await request.json();
-    
+
     // Handle single item creation/update
     const item = body;
-    
+
     // Validate required fields
     if (!item.name || !item.position || !item.image) {
       return NextResponse.json({ error: 'Name, position, and image are required' }, { status: 400 });
@@ -48,24 +50,25 @@ export async function POST(request: NextRequest) {
       ...(item.id && item.id !== 0 && { id: item.id }), // Only include valid id
     };
 
+    const admin = assertSupabaseAdmin();
     let result;
     if (item.id && item.id !== 0) {
       // Update existing item
-      const { data, error } = await supabase
+      const { data, error } = await admin
         .from('team_members')
         .update(teamMemberData)
         .eq('id', item.id)
         .select();
-      
+
       if (error) throw error;
       result = data;
     } else {
       // Create new item
-      const { data, error } = await supabase
+      const { data, error } = await admin
         .from('team_members')
         .insert([teamMemberData])
         .select();
-      
+
       if (error) throw error;
       result = data;
     }
@@ -77,7 +80,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function DELETE(request: NextRequest) {
+async function deleteHandler(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
@@ -86,7 +89,8 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'ID is required' }, { status: 400 });
     }
 
-    const { error } = await supabase
+    const admin = assertSupabaseAdmin();
+    const { error } = await admin
       .from('team_members')
       .delete()
       .eq('id', parseInt(id));
@@ -102,3 +106,6 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+export const POST = withAdminAuthSimple(postHandler);
+export const DELETE = withAdminAuthSimple(deleteHandler);

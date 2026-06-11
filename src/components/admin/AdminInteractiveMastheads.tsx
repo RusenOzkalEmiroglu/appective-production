@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { MastheadItem } from '@/data/interactiveMastheadsData';
 import MastheadForm from '@/components/admin/MastheadForm';
-import { supabase } from '@/lib/supabase';
 import { fetchWithAuth } from '@/lib/auth';
 
 // Define colors based on Appective theme
@@ -52,32 +51,13 @@ const AdminInteractiveMastheadsPage = () => {
     setIsLoading(true);
     setError('');
     try {
-      const { data, error } = await supabase
-        .from('interactive_mastheads')
-        .select('*')
-        .order('id');
-      
-      if (error) throw error;
-      
-      // Supabase verilerini MastheadItem formatına dönüştür
-      const formattedData = (data || []).map((item: any) => ({
-        id: item.id,
-        category: item.category,
-        brand: item.brand,
-        title: item.title,
-        image: item.image,
-        popupHtmlPath: item.popup_html_path,
-        popupTitle: item.popup_title,
-        popupDescription: item.popup_description || '',
-        bannerDetails: {
-          size: item.banner_size || '',
-          platforms: item.banner_platforms || ''
-        }
-      }));
-      
+      const res = await fetch('/api/mastheads');
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      const formattedData: MastheadItem[] = await res.json();
+
       setMastheads(formattedData);
       setFilteredMastheads(formattedData);
-      
+
       // Extract unique categories and brands for filters
       const uniqueCategories = ['ALL', ...Array.from(new Set(formattedData.map((item: MastheadItem) => item.category.toUpperCase())))];
       const uniqueBrands = ['ALL', ...Array.from(new Set(formattedData.map((item: MastheadItem) => item.brand)))];
@@ -119,60 +99,30 @@ const AdminInteractiveMastheadsPage = () => {
 
   const handleFormSubmit = async (data: MastheadItem) => {
     try {
-      if (isEditMode && editingItem) {
-        // Update existing masthead
-        const { error } = await supabase
-          .from('interactive_mastheads')
-          .update({
-            title: data.title,
-            category: data.category,
-            brand: data.brand,
-            image: data.image,
-            popup_html_path: data.popupHtmlPath,
-            popup_title: data.title, // popup_title alanı zorunlu
-            popup_description: data.popupDescription || '',
-            banner_size: data.bannerDetails?.size || '',
-            banner_platforms: data.bannerDetails?.platforms || ''
-          })
-          .eq('id', editingItem.id);
+      // Build the payload: include id only when editing (upsert by id), omit for new items (route generates id)
+      const payload: Partial<MastheadItem> & { popupTitle: string } = {
+        ...data,
+        popupTitle: data.title, // popup_title field is required, mirror from title
+      };
+      if (!isEditMode) {
+        delete (payload as any).id;
+      } else if (editingItem) {
+        payload.id = editingItem.id;
+      }
 
-        if (error) throw error;
-
-        // Update local state
-        const updatedMastheads = mastheads.map(item => 
-          item.id === editingItem.id ? { ...data, id: editingItem.id } : item
-        );
-        setMastheads(updatedMastheads);
-      } else {
-        // Add new masthead - ID otomatik üretimi
-        const newId = 'masthead_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        
-        const { data: newData, error } = await supabase
-          .from('interactive_mastheads')
-          .insert({
-            id: newId,
-            title: data.title,
-            category: data.category,
-            brand: data.brand,
-            image: data.image,
-            popup_html_path: data.popupHtmlPath,
-            popup_title: data.title, // popup_title alanı zorunlu
-            popup_description: data.popupDescription || '',
-            banner_size: data.bannerDetails?.size || '',
-            banner_platforms: data.bannerDetails?.platforms || ''
-          })
-          .select()
-          .single();
-
-        if (error) throw error;
-
-        // Update local state
-        const newItem = { ...data, id: newData.id };
-        setMastheads([...mastheads, newItem]);
+      const res = await fetchWithAuth('/api/mastheads', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j.message || 'save failed');
       }
 
       setShowForm(false);
       setEditingItem(null);
+      // Refresh the full list from the API to reflect the saved state
+      await fetchMastheads();
     } catch (err: any) {
       console.error('Masthead kaydetme hatası:', err);
       setError(err.message || 'Masthead kaydedilemedi.');
@@ -229,12 +179,8 @@ const AdminInteractiveMastheadsPage = () => {
   const handleDeleteItem = async (itemId: string) => {
     if (window.confirm('Bu masthead öğesini silmek istediğinizden emin misiniz? Bu değişiklik kalıcı olacaktır.')) {
       try {
-        const { error } = await supabase
-          .from('interactive_mastheads')
-          .delete()
-          .eq('id', itemId); // ID text tipinde olduğu için parseInt kaldırıldı
-
-        if (error) throw error;
+        const res = await fetchWithAuth(`/api/mastheads?id=${encodeURIComponent(itemId)}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error('delete failed');
 
         // Update local state
         setMastheads(mastheads.filter(item => item.id !== itemId));

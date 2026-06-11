@@ -86,17 +86,6 @@ const AdminInteractiveMastheadsPage = () => {
     setShowForm(true);
   };
 
-  const saveMastheadsToServer = async (updatedMastheads: MastheadItem[]) => {
-    try {
-      // Bu fonksiyon artık handleFormSubmit içinde tek tek kayıt yapıldığı için gerekli değil
-      // Ama mevcut kod yapısını bozmamak için bırakıyoruz
-      console.log('Mastheads kaydedildi!');
-    } catch (err: any) {
-      console.error("Save Mastheads Error:", err);
-      setError(err.message || 'Masthead verileri kaydedilemedi.');
-    }
-  };
-
   const handleFormSubmit = async (data: MastheadItem) => {
     try {
       // Build the payload: include id only when editing (upsert by id), omit for new items (route generates id)

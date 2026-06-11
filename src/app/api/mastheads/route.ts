@@ -65,7 +65,7 @@ async function postHandler(request: NextRequest) {
     const body = await request.json();
     const admin = assertSupabaseAdmin();
     const row = toRow(body);
-    if (!row.id) row.id = `masthead_${Date.now()}`;
+    if (!row.id) row.id = `masthead_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
     const { data, error } = await admin.from('interactive_mastheads').upsert(row).select().single();
     if (error) throw error;
     return NextResponse.json(data, { status: 200 });

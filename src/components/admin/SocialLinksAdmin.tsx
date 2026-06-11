@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { supabase, SocialLink } from '@/lib/supabase';
+import { SocialLink } from '@/lib/supabase';
+import { fetchWithAuth } from '@/lib/auth';
 
 // Social platform icon mapping (for demo, use lucide-react or similar)
 import { Facebook, Linkedin, Instagram, Twitter, Plus, Trash2, Save } from "lucide-react";
@@ -26,12 +27,9 @@ const SocialLinksAdmin: React.FC = () => {
   useEffect(() => {
     const loadLinks = async () => {
       try {
-        const { data, error } = await supabase
-          .from('social_links')
-          .select('*')
-          .order('id');
-        
-        if (error) throw error;
+        const res = await fetch('/api/social-links');
+        if (!res.ok) throw new Error('load failed');
+        const data = await res.json();
         setLinks(data || []);
       } catch (err: any) {
         console.error("Failed to load social links:", err);
@@ -49,26 +47,15 @@ const SocialLinksAdmin: React.FC = () => {
     setError("");
     setSuccess("");
     try {
-      // Delete all existing links and insert new ones
-      const { error: deleteError } = await supabase
-        .from('social_links')
-        .delete()
-        .neq('id', 0); // Delete all records
-      
-      if (deleteError) throw deleteError;
-      
-      // Insert new links
-      if (updatedLinks.length > 0) {
-        const { error: insertError } = await supabase
-          .from('social_links')
-          .insert(updatedLinks.map(link => ({
-            platform: link.platform,
-            url: link.url
-          })));
-        
-        if (insertError) throw insertError;
+      const res = await fetchWithAuth('/api/social-links', {
+        method: 'POST',
+        body: JSON.stringify(updatedLinks),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j.message || 'save failed');
       }
-      
+
       setSuccess("Başarıyla kaydedildi.");
       setTimeout(() => setSuccess(""), 2500);
     } catch (e: any) {
@@ -80,68 +67,27 @@ const SocialLinksAdmin: React.FC = () => {
   };
 
 
-  const handleAdd = async () => {
+  const handleAdd = () => {
     if (!newPlatform || !newUrl) return;
     if (links.some((l) => l.platform === newPlatform)) {
       setError("Bu platform zaten ekli.");
       return;
     }
-    
-    try {
-      const { data, error } = await supabase
-        .from('social_links')
-        .insert([{ platform: newPlatform, url: newUrl }])
-        .select();
-      
-      if (error) throw error;
-      
-      setLinks([...links, data[0]]);
-      setNewPlatform("");
-      setNewUrl("");
-      setSuccess("Platform başarıyla eklendi.");
-      setTimeout(() => setSuccess(""), 2500);
-    } catch (err: any) {
-      setError(err.message);
-      console.error('Social link add error:', err);
-    }
+    setLinks([...links, { platform: newPlatform, url: newUrl } as SocialLink]);
+    setNewPlatform("");
+    setNewUrl("");
+    setSuccess("Platform başarıyla eklendi.");
+    setTimeout(() => setSuccess(""), 2500);
   };
 
-  const handleDelete = async (platform: string) => {
-    try {
-      const { error } = await supabase
-        .from('social_links')
-        .delete()
-        .eq('platform', platform);
-      
-      if (error) throw error;
-      
-      const updated = links.filter((l) => l.platform !== platform);
-      setLinks(updated);
-      setSuccess("Platform başarıyla silindi.");
-      setTimeout(() => setSuccess(""), 2500);
-    } catch (err: any) {
-      setError(err.message);
-      console.error('Social link delete error:', err);
-    }
+  const handleDelete = (platform: string) => {
+    setLinks(links.filter((l) => l.platform !== platform));
+    setSuccess("Platform başarıyla silindi.");
+    setTimeout(() => setSuccess(""), 2500);
   };
 
-  const handleUrlChange = async (platform: string, url: string) => {
-    try {
-      const { error } = await supabase
-        .from('social_links')
-        .update({ url, updated_at: new Date().toISOString() })
-        .eq('platform', platform);
-      
-      if (error) throw error;
-      
-      const updated = links.map((l) =>
-        l.platform === platform ? { ...l, url } : l
-      );
-      setLinks(updated);
-    } catch (err: any) {
-      setError(err.message);
-      console.error('Social link update error:', err);
-    }
+  const handleUrlChange = (platform: string, url: string) => {
+    setLinks(links.map((l) => l.platform === platform ? { ...l, url } : l));
   };
 
   const handleSave = () => {

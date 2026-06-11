@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { RefreshCw, Download, Search, Trash2, ChevronLeft, ChevronRight, X } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { fetchWithAuth } from '@/lib/auth';
 
 interface Subscriber {
   id: string;
@@ -24,21 +24,12 @@ const NewsletterSubscribers = () => {
     setLoading(true);
     setError(null);
     try {
-      const { data, error } = await supabase
-        .from('newsletter_subscribers')
-        .select('*')
-        .order('subscribed_at', { ascending: false });
-      
-      if (error) throw error;
-      
-      // Map Supabase data to component format
-      const mappedData = (data || []).map(item => ({
-        id: item.id.toString(),
-        email: item.email,
-        subscribedAt: item.subscribed_at
-      }));
-      
-      setSubscribers(mappedData);
+      const res = await fetchWithAuth('/api/newsletter');
+      if (!res.ok) throw new Error('load failed');
+      const json = await res.json();
+      const list = json.subscribers || [];
+      // API returns { id, email, subscribedAt } — matches Subscriber interface directly
+      setSubscribers(list as Subscriber[]);
     } catch (err: any) {
       setError('Aboneler yüklenirken hata oluştu. Lütfen tekrar deneyin.');
       console.error('Error fetching subscribers:', err);
@@ -57,12 +48,11 @@ const NewsletterSubscribers = () => {
 
     setDeleteLoading(true);
     try {
-      const { error } = await supabase
-        .from('newsletter_subscribers')
-        .delete()
-        .in('id', ids.map(id => parseInt(id)));
-
-      if (error) throw error;
+      const res = await fetchWithAuth('/api/newsletter', {
+        method: 'DELETE',
+        body: JSON.stringify({ ids }),
+      });
+      if (!res.ok) throw new Error('delete failed');
 
       setSubscribers(prev => prev.filter(s => !ids.includes(s.id)));
       setSelectedSubscribers(prev => prev.filter(subId => !ids.includes(subId)));

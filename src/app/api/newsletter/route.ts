@@ -1,23 +1,29 @@
-import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { NextRequest, NextResponse } from 'next/server';
+import { assertSupabaseAdmin } from '@/lib/supabaseAdmin';
+import { withAdminAuthSimple } from '@/lib/withAdminAuth';
 
-// Get all subscribers
-export async function GET() {
+// Force dynamic rendering to avoid Vercel Edge Cache
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+// Get all subscribers — admin-only
+async function getHandler(): Promise<NextResponse> {
   try {
-    const { data, error } = await supabase
+    const admin = assertSupabaseAdmin();
+    const { data, error } = await admin
       .from('newsletter_subscribers')
       .select('*')
       .order('subscribed_at', { ascending: false });
-    
+
     if (error) throw error;
-    
+
     // Format for compatibility with existing frontend
     const formattedSubscribers = (data || []).map(sub => ({
       id: sub.id.toString(),
       email: sub.email,
       subscribedAt: sub.subscribed_at
     }));
-    
+
     return NextResponse.json({ subscribers: formattedSubscribers }, { status: 200 });
   } catch (error) {
     console.error('Error reading newsletter subscribers:', error);
@@ -28,11 +34,11 @@ export async function GET() {
   }
 }
 
-// Add a new subscriber
+// Add a new subscriber — public, but uses service-role so it works after anon-write is blocked
 export async function POST(request: Request) {
   try {
     const { email } = await request.json();
-    
+
     // Validate email
     if (!email || !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
       return NextResponse.json(
@@ -40,23 +46,25 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-    
+
+    const admin = assertSupabaseAdmin();
+
     // Check if email already exists
-    const { data: existingSubscriber } = await supabase
+    const { data: existingSubscriber } = await admin
       .from('newsletter_subscribers')
       .select('*')
       .eq('email', email.toLowerCase())
       .single();
-    
+
     if (existingSubscriber) {
       return NextResponse.json(
         { error: 'Bu e-posta adresi zaten kayıtlı' },
         { status: 409 }
       );
     }
-    
+
     // Create new subscriber
-    const { data: newSubscriber, error } = await supabase
+    const { data: newSubscriber, error } = await admin
       .from('newsletter_subscribers')
       .insert({
         email: email.toLowerCase(),
@@ -64,18 +72,18 @@ export async function POST(request: Request) {
       })
       .select()
       .single();
-    
+
     if (error) throw error;
-    
-    return NextResponse.json({ 
-      success: true, 
+
+    return NextResponse.json({
+      success: true,
       subscriber: {
         id: newSubscriber.id.toString(),
         email: newSubscriber.email,
         subscribedAt: newSubscriber.subscribed_at
       }
     }, { status: 201 });
-    
+
   } catch (error) {
     console.error('Newsletter abonelik hatası:', error);
     return NextResponse.json(
@@ -85,26 +93,26 @@ export async function POST(request: Request) {
   }
 }
 
-// Delete a subscriber
-export async function DELETE(request: Request) {
+// Delete a subscriber — admin-only
+async function deleteHandler(request: NextRequest): Promise<NextResponse> {
   try {
     const { ids } = await request.json();
-    
+
     if (!ids || !Array.isArray(ids) || ids.length === 0) {
       return NextResponse.json(
         { error: 'Abone ID\'leri gerekli' },
         { status: 400 }
       );
     }
-    
-    // Delete subscribers
-    const { error } = await supabase
+
+    const admin = assertSupabaseAdmin();
+    const { error } = await admin
       .from('newsletter_subscribers')
       .delete()
       .in('id', ids.map(id => parseInt(id)));
-    
+
     if (error) throw error;
-    
+
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
     console.error('Newsletter abonesi silme hatası:', error);
@@ -114,3 +122,6 @@ export async function DELETE(request: Request) {
     );
   }
 }
+
+export const GET = withAdminAuthSimple(getHandler);
+export const DELETE = withAdminAuthSimple(deleteHandler);

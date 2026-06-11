@@ -81,6 +81,30 @@ async function deleteHandler(request: NextRequest) {
   }
 }
 
-// Apply auth middleware to POST and DELETE
+// PUT handler to update a partner logo's alt and url by id
+async function putHandler(request: NextRequest) {
+  try {
+    const id = new URL(request.url).searchParams.get('id');
+    if (!id) return NextResponse.json({ message: 'ID is required' }, { status: 400 });
+    const { alt, url } = await request.json();
+    const admin = assertSupabaseAdmin();
+    const { data, error } = await admin
+      .from('partner_logos')
+      .update({ alt, url: url || null })
+      .eq('id', parseInt(id, 10))
+      .select();
+    if (error) {
+      console.error('partner-logos PUT error:', error);
+      return NextResponse.json({ message: 'Database error', error: error.message }, { status: 500 });
+    }
+    return NextResponse.json({ message: 'Logo updated successfully', data });
+  } catch (error) {
+    console.error('Error updating logo:', error);
+    return NextResponse.json({ message: 'Error updating logo' }, { status: 500 });
+  }
+}
+
+// Apply auth middleware to POST, DELETE, and PUT
 export const POST = withAdminAuthSimple(postHandler);
 export const DELETE = withAdminAuthSimple(deleteHandler);
+export const PUT = withAdminAuthSimple(putHandler);

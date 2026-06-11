@@ -207,13 +207,9 @@ const AdminPartnersManagementPage = () => {
     setDeletingLogoInfo({ categoryId, logoId });
     setError(null);
     try {
-      const { error } = await supabase
-        .from('partner_logos')
-        .delete()
-        .eq('id', parseInt(logoId));
-      
-      if (error) throw error;
-      
+      const res = await fetchWithAuth(`/api/partner-logos?id=${logoId}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('delete failed');
+
       await fetchCategories(); // Refresh the list
     } catch (err: any) {
       console.error(`Error deleting logo ${logoId} from category ${categoryId}:`, err);
@@ -247,16 +243,12 @@ const AdminPartnersManagementPage = () => {
     setError(null);
     const { categoryId, logoId } = editingLogoInfo;
     try {
-      const { error } = await supabase
-        .from('partner_logos')
-        .update({ 
-          alt: editLogoAlt, 
-          url: editLogoUrl || null 
-        })
-        .eq('id', parseInt(logoId));
-      
-      if (error) throw error;
-      
+      const res = await fetchWithAuth(`/api/partner-logos?id=${logoId}`, {
+        method: 'PUT',
+        body: JSON.stringify({ alt: editLogoAlt, url: editLogoUrl || null }),
+      });
+      if (!res.ok) throw new Error('update failed');
+
       await fetchCategories(); // Refresh the list
       handleCancelEditLogo(); // Close edit form
     } catch (err: any) {

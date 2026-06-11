@@ -4,6 +4,9 @@ import { Inter, Montserrat } from 'next/font/google';
 import Footer from '@/components/Footer';
 import { getSocialLinks } from '@/lib/data';
 
+
+
+
 const inter = Inter({
   subsets: ['latin'],
   display: 'swap',

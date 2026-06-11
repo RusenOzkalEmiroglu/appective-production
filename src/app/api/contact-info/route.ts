@@ -1,55 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs/promises';
-import path from 'path';
+import { supabase } from '@/lib/supabase';
+import { assertSupabaseAdmin } from '@/lib/supabaseAdmin';
 import { withAdminAuthSimple } from '@/lib/withAdminAuth';
 
-const contactInfoPath = path.join(process.cwd(), 'data', 'contactInfo.json');
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
-// Function to ensure the data directory and file exist
-async function ensureFileExists() {
-  try {
-    await fs.access(contactInfoPath);
-  } catch {
-    try {
-      await fs.mkdir(path.dirname(contactInfoPath), { recursive: true });
-      // Create with a default empty object structure
-      await fs.writeFile(contactInfoPath, JSON.stringify({}, null, 2));
-    } catch (setupError) {
-      console.error('Failed to create contact info file or directory:', setupError);
-      throw new Error('Failed to initialize contact info storage.');
-    }
-  }
-}
-
-// --- Public Handlers ---
-
-// GET handler remains public
 export async function GET() {
-  try {
-    await ensureFileExists();
-    const fileContents = await fs.readFile(contactInfoPath, 'utf8');
-    const contactInfo = JSON.parse(fileContents);
-    return NextResponse.json(contactInfo);
-  } catch (error) {
-    console.error('Failed to read contact info:', error);
-    return NextResponse.json({ message: 'Failed to read contact info' }, { status: 500 });
+  const { data, error } = await supabase
+    .from('contact_info')
+    .select('*')
+    .order('id');
+  if (error) {
+    console.error('contact-info GET error:', error);
+    return NextResponse.json({ message: 'Failed to fetch contact info' }, { status: 500 });
   }
+  return NextResponse.json(data || []);
 }
 
-// --- Protected Handlers ---
-
-// Original POST handler logic
+// Upsert each contact-info row provided
 async function postHandler(request: NextRequest) {
   try {
-    await ensureFileExists();
-    const data = await request.json();
-    await fs.writeFile(contactInfoPath, JSON.stringify(data, null, 2), 'utf8');
-    return NextResponse.json({ message: 'Contact info updated successfully' });
-  } catch (error) {
-    console.error('Failed to write contact info:', error);
-    return NextResponse.json({ message: 'Failed to write contact info' }, { status: 500 });
+    const rows = await request.json();
+    if (!Array.isArray(rows)) {
+      return NextResponse.json({ message: 'Expected an array of contact rows' }, { status: 400 });
+    }
+    const admin = assertSupabaseAdmin();
+    for (const row of rows) {
+      const payload = { icon: row.icon, title: row.title, details: row.details, link: row.link ?? null };
+      if (row.id) {
+        const { error } = await admin.from('contact_info').update(payload).eq('id', row.id);
+        if (error) throw error;
+      } else {
+        const { error } = await admin.from('contact_info').insert(payload);
+        if (error) throw error;
+      }
+    }
+    return NextResponse.json({ success: true });
+  } catch (e: any) {
+    console.error('contact-info POST error:', e);
+    return NextResponse.json({ message: 'Failed to save contact info', error: e.message }, { status: 500 });
   }
 }
 
-// Wrap the POST handler with authentication
 export const POST = withAdminAuthSimple(postHandler);

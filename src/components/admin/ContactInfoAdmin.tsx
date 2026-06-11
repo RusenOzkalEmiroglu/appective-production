@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { supabase, ContactInfo } from '@/lib/supabase';
+import { ContactInfo } from '@/lib/supabase';
+import { fetchWithAuth } from '@/lib/auth';
 
 const ContactInfoAdmin = () => {
   const [contactInfo, setContactInfo] = useState<ContactInfo[]>([]);
@@ -12,12 +13,9 @@ const ContactInfoAdmin = () => {
   useEffect(() => {
     const fetchContactInfo = async () => {
       try {
-        const { data, error } = await supabase
-          .from('contact_info')
-          .select('*')
-          .order('id');
-        
-        if (error) throw error;
+        const res = await fetch('/api/contact-info');
+        if (!res.ok) throw new Error('load failed');
+        const data = await res.json();
         setContactInfo(data || []);
       } catch (err: any) {
         setError(err.message);
@@ -39,22 +37,14 @@ const ContactInfoAdmin = () => {
     setError('');
     setSuccess('');
     try {
-      // Update each contact info item
-      for (const info of contactInfo) {
-        const { error } = await supabase
-          .from('contact_info')
-          .update({
-            icon: info.icon,
-            title: info.title,
-            details: info.details,
-            link: info.link,
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', info.id);
-        
-        if (error) throw error;
+      const res = await fetchWithAuth('/api/contact-info', {
+        method: 'POST',
+        body: JSON.stringify(contactInfo),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j.message || 'save failed');
       }
-      
       setSuccess('İletişim bilgileri başarıyla güncellendi!');
     } catch (err: any) {
       setError(err.message);

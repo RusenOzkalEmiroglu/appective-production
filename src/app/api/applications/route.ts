@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { assertSupabaseAdmin } from '@/lib/supabaseAdmin';
 import { withAdminAuthSimple } from '@/lib/withAdminAuth';
 
 // GET: Fetch all applications from Supabase
@@ -34,7 +35,8 @@ async function postHandler(request: NextRequest) {
       return NextResponse.json({ message: 'Title and description are required' }, { status: 400 });
     }
 
-    const { data, error } = await supabase
+    const admin = assertSupabaseAdmin();
+    const { data, error } = await admin
       .from('applications')
       .insert([newApplicationData])
       .select()
@@ -60,7 +62,8 @@ async function putHandler(request: NextRequest) {
       return NextResponse.json({ message: 'Application ID is required for update' }, { status: 400 });
     }
 
-    const { data, error } = await supabase
+    const admin = assertSupabaseAdmin();
+    const { data, error } = await admin
       .from('applications')
       .update(updatedApplication)
       .eq('id', updatedApplication.id)
@@ -84,12 +87,13 @@ async function deleteHandler(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
-    
+
     if (!id) {
       return NextResponse.json({ message: 'Application ID is required' }, { status: 400 });
     }
 
-    const { error } = await supabase
+    const admin = assertSupabaseAdmin();
+    const { error } = await admin
       .from('applications')
       .delete()
       .eq('id', parseInt(id, 10));

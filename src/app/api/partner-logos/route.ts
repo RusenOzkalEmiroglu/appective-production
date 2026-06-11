@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { assertSupabaseAdmin } from '@/lib/supabaseAdmin';
 import { withAdminAuthSimple } from '@/lib/withAdminAuth';
 
 // GET handler to fetch all partner logos
@@ -29,7 +30,8 @@ async function postHandler(request: NextRequest) {
       return NextResponse.json({ message: 'category_id, alt, and image_path are required' }, { status: 400 });
     }
 
-    const { data, error } = await supabase
+    const admin = assertSupabaseAdmin();
+    const { data, error } = await admin
       .from('partner_logos')
       .insert([{
         category_id: parseInt(category_id),
@@ -61,7 +63,8 @@ async function deleteHandler(request: NextRequest) {
       return NextResponse.json({ message: 'ID is required' }, { status: 400 });
     }
 
-    const { error } = await supabase
+    const admin = assertSupabaseAdmin();
+    const { error } = await admin
       .from('partner_logos')
       .delete()
       .eq('id', parseInt(id));

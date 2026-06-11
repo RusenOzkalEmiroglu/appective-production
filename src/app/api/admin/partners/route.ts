@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { assertSupabaseAdmin } from '@/lib/supabaseAdmin';
 
 // Helper function to verify admin authentication
 async function verifyAdmin(request: NextRequest) {
@@ -59,8 +60,9 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // Insert logo using authenticated user's session
-    const { data, error } = await supabase
+    // Insert logo using service-role client
+    const admin = assertSupabaseAdmin();
+    const { data, error } = await admin
       .from('partner_logos')
       .insert([{
         category_id: parseInt(category_id),
@@ -113,8 +115,9 @@ export async function DELETE(request: NextRequest) {
       }, { status: 400 });
     }
 
-    // Delete logo using authenticated user's session
-    const { error } = await supabase
+    // Delete logo using service-role client
+    const admin = assertSupabaseAdmin();
+    const { error } = await admin
       .from('partner_logos')
       .delete()
       .eq('id', parseInt(logoId));

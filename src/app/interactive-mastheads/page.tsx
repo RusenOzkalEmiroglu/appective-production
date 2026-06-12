@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useRef, useEffect } from 'react';
+import { useIsMobile } from '@/lib/useIsMobile';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -15,6 +16,7 @@ const DynamicTypographicBackground = dynamic(
 import MastheadPopup from '@/components/MastheadPopup';
 
 export default function InteractiveMastheadsPage() {
+  const isMobile = useIsMobile();
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [selectedBrand, setSelectedBrand] = useState<string>('ALL');
   const [selectedAdFormat, setSelectedAdFormat] = useState<string>('ALL');
@@ -222,7 +224,7 @@ export default function InteractiveMastheadsPage() {
   return (
     <>
       <div className="noise-bg"></div>
-      <DynamicTypographicBackground />
+      {!isMobile && <DynamicTypographicBackground />}
       <div className="relative z-10 min-h-screen text-white p-4 sm:p-6 lg:p-8">
         <div className="max-w-7xl mx-auto">
           

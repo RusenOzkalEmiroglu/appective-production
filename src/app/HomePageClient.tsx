@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState } from 'react';
+import { useIsMobile } from '@/lib/useIsMobile';
 import dynamic from 'next/dynamic';
 import Header from '@/components/Header';
 import Hero from '@/components/Hero';
@@ -42,6 +43,7 @@ const DynamicTypographicBackground = dynamic(
 import { SocialLink, ContactInfo } from '@/lib/data';
 
 export default function HomePageClient({ socialLinks, contactInfo }: { socialLinks: SocialLink[], contactInfo: ContactInfo[] }) {
+  const isMobile = useIsMobile();
   const [scrollY, setScrollY] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -86,7 +88,7 @@ export default function HomePageClient({ socialLinks, contactInfo }: { socialLin
       <Suspense fallback={<div className="fixed inset-0 bg-dark" />}>
         {/* <ParticleBackgroundWithKey scrollY={scrollY} /> */}
       </Suspense>
-      <DynamicTypographicBackground />
+      {!isMobile && <DynamicTypographicBackground />}
       
       <div className="relative z-10">
         <Header />

@@ -202,14 +202,14 @@ const WorkShowcase = () => {
   };
 
   return (
-    <section id="work" ref={sectionRef} className="section py-24 relative overflow-hidden">
+    <section id="work" ref={sectionRef} className="section py-14 md:py-24 relative overflow-hidden">
       <div className="absolute inset-0 z-0">
         <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-[#07081e]/70 to-transparent"></div>
         <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-[#07081e]/70 to-transparent"></div>
       </div>
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         <motion.div
-          className="text-center mb-16"
+          className="text-center mb-8 md:mb-16"
           initial="hidden"
           animate={controls}
           variants={{
@@ -227,13 +227,13 @@ const WorkShowcase = () => {
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 gradient-text">
             Our Work
           </h2>
-          <p className="text-white/70 max-w-2xl mx-auto text-lg">
+          <p className="text-white/70 max-w-2xl mx-auto text-sm md:text-lg">
             Discover how we help brands stand out in the digital world with our creative solutions.
           </p>
         </motion.div>
         
         <motion.div
-          className="flex flex-wrap justify-center gap-4 mb-12"
+          className="flex flex-wrap justify-center gap-2 md:gap-4 mb-8 md:mb-12"
           initial="hidden"
           animate={controls}
           variants={{
@@ -252,7 +252,7 @@ const WorkShowcase = () => {
           {categories.filter(category => category.id !== 'all').map((category) => (
             <motion.button
               key={category.id}
-              className={`px-6 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+              className={`px-4 py-1.5 md:px-6 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all duration-300 ${
                 activeCategory === category.id
                   ? 'bg-primary text-white'
                   : 'bg-white/10 text-white/70 hover:bg-white/20'
@@ -266,8 +266,8 @@ const WorkShowcase = () => {
           ))}
         </motion.div>
         
-        <div className="space-y-16">
-          <div ref={projectsContainerRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="space-y-8 md:space-y-16">
+          <div ref={projectsContainerRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
           {filteredProjects.map((project) => (
             <motion.div
               key={project.id}
@@ -318,7 +318,7 @@ const WorkShowcase = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-dark to-transparent opacity-70" />
               </div>
               
-              <div className="absolute bottom-0 left-0 w-full p-6 transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+              <div className="absolute bottom-0 left-0 w-full p-4 md:p-6 transform md:translate-y-4 md:opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
                 <span className="inline-block px-3 py-1 bg-primary/80 text-white text-xs rounded-full mb-3">
                   {categories.find(cat => cat.id === project.category)?.name}
                 </span>
@@ -339,7 +339,7 @@ const WorkShowcase = () => {
             >
               <motion.button
                 onClick={() => window.open('/interactive-mastheads', '_blank')}
-                className="magnetic interactive-btn bg-gradient-to-r from-purple-600 via-pink-600 to-red-500 text-white px-8 py-4 rounded-full text-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-purple-500/20 flex items-center gap-2 group"
+                className="magnetic interactive-btn bg-gradient-to-r from-purple-600 via-pink-600 to-red-500 text-white px-5 py-3 md:px-8 md:py-4 rounded-full text-sm md:text-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-purple-500/20 flex items-center gap-2 group w-full sm:w-auto justify-center"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -393,7 +393,7 @@ const WorkShowcase = () => {
                   style={{ backgroundImage: `url(${activeProject.image})` }}
                 />
               </div>
-              <div className="p-8">
+              <div className="p-4 md:p-8">
                 <span className="inline-block px-3 py-1 bg-primary/80 text-white text-xs rounded-full mb-3">
                   {categories.find(cat => cat.id === activeProject.category)?.name}
                 </span>

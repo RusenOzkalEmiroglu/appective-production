@@ -64,7 +64,7 @@ const AboutSection = () => {
   }, [isInView, controls, stats]);
 
   return (
-    <section id="about" ref={sectionRef} className="section py-24 relative overflow-hidden">
+    <section id="about" ref={sectionRef} className="section py-14 md:py-24 relative overflow-hidden">
       <div className="absolute inset-0 z-0">
         <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-[#07081e]/70 to-transparent"></div>
         <div className="absolute bottom-0 left-0 w-full h-64 bg-gradient-to-t from-[#07081e]/70 to-transparent"></div>
@@ -74,7 +74,7 @@ const AboutSection = () => {
       </div>
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         <motion.div
-          className="text-center mb-16"
+          className="text-center mb-8 md:mb-16"
           initial="hidden"
           animate={controls}
           variants={{
@@ -92,12 +92,12 @@ const AboutSection = () => {
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 gradient-text">
             About Us
           </h2>
-          <p className="text-white/70 max-w-2xl mx-auto text-lg">
+          <p className="text-white/70 max-w-2xl mx-auto text-sm md:text-lg">
             We are a team that creates innovative and impressive solutions that leave a mark in the digital world.
           </p>
         </motion.div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center mb-20">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-16 items-center mb-12 md:mb-20">
           <motion.div
             initial="hidden"
             animate={controls}
@@ -114,17 +114,17 @@ const AboutSection = () => {
               }
             }}
           >
-            <h3 className="text-2xl md:text-3xl font-bold mb-6">In the Digital World <span className="gradient-text">We Make a Difference</span></h3>
-            <p className="text-white/70 mb-6">
+            <h3 className="text-xl md:text-2xl lg:text-3xl font-bold mb-4 md:mb-6">In the Digital World <span className="gradient-text">We Make a Difference</span></h3>
+            <p className="text-white/70 mb-4 md:mb-6 text-sm md:text-base">
               Appective is one of Turkey's leading digital advertising agencies. We combine creative design, technological innovation, and strategic thinking to make brands stand out in the digital world.
             </p>
-            <p className="text-white/70 mb-8">
+            <p className="text-white/70 mb-6 md:mb-8 text-sm md:text-base">
               Our team consists of the industry's most talented designers, developers, and strategists. In every project, we strive to understand our clients' needs, help them achieve their goals, and exceed their expectations.
             </p>
             
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-3 md:gap-4">
               <motion.button
-                className="magnetic interactive-btn bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-full text-sm font-medium transition-all duration-300"
+                className="magnetic interactive-btn bg-primary hover:bg-primary-dark text-white px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 w-full sm:w-auto text-center"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => scrollToSection('contact')}
@@ -132,7 +132,7 @@ const AboutSection = () => {
                 Learn More
               </motion.button>
               <motion.button
-                className="magnetic interactive-btn bg-transparent border border-white/20 hover:border-primary/50 text-white px-6 py-3 rounded-full text-sm font-medium transition-all duration-300"
+                className="magnetic interactive-btn bg-transparent border border-white/20 hover:border-primary/50 text-white px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 w-full sm:w-auto text-center"
                 whileHover={{ scale: 1.05, borderColor: 'rgba(138, 43, 226, 0.8)' }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => scrollToSection('team')}
@@ -183,11 +183,11 @@ const AboutSection = () => {
         </div>
         
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-20">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-12 md:mb-20">
           {stats.map((stat, index) => (
             <motion.div
               key={index}
-              className="bg-dark/50 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-center"
+              className="bg-dark/50 backdrop-blur-sm border border-white/10 rounded-2xl p-4 md:p-6 text-center"
               initial="hidden"
               animate={controls}
               variants={{
@@ -210,7 +210,7 @@ const AboutSection = () => {
             >
               <div 
                 ref={(el: HTMLDivElement | null) => { counterRefs.current[index] = el; }}
-                className="text-3xl md:text-4xl font-bold gradient-text mb-2"
+                className="text-2xl md:text-3xl lg:text-4xl font-bold gradient-text mb-1 md:mb-2"
               >
                 0+
               </div>

@@ -279,7 +279,7 @@ const AppfectSection = () => {
 
           <AnimatePresence mode="wait">
             {activeTab === 'discovery' && (
-              <motion.div key="discovery" variants={tabContentVariants} initial="hidden" animate="visible" exit="exit" className="grid md:grid-cols-12 gap-6 min-h-[380px] sm:min-h-[420px]">
+              <motion.div key="discovery" variants={tabContentVariants} initial="hidden" animate="visible" exit="exit" className="grid grid-cols-1 md:grid-cols-12 gap-6 min-h-[300px] md:min-h-[380px]">
                 <div className="md:col-span-4 bg-black/20 p-3 sm:p-4 rounded-lg">
                   <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-purple-300">Browse Publishers</h4>
                   {['Countries', 'Traffic Sources', 'Verticals', 'Audience Size', 'OS', 'Labels'].map(filter => (
@@ -330,7 +330,7 @@ const AppfectSection = () => {
             )}
 
             {activeTab === 'reporting' && (
-              <motion.div key="reporting" variants={tabContentVariants} initial="hidden" animate="visible" exit="exit" className="grid md:grid-cols-12 gap-6 min-h-[380px] sm:min-h-[420px]">
+              <motion.div key="reporting" variants={tabContentVariants} initial="hidden" animate="visible" exit="exit" className="grid grid-cols-1 md:grid-cols-12 gap-6 min-h-[300px] md:min-h-[380px]">
                 {/* Report Config Column */}
                 <div className="md:col-span-4 bg-black/20 p-3 sm:p-4 rounded-lg">
                   <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-purple-300">Report Settings</h4>

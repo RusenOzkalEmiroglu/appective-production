@@ -265,7 +265,7 @@ const InteractiveAppfectSection = () => {
         <motion.div variants={itemVariants} className="text-center mb-12 md:mb-16">
           <motion.h1
             variants={itemVariants}
-            className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-red-400"
+            className="text-3xl sm:text-5xl md:text-6xl font-extrabold mb-6 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-red-400"
           >
             Experience Appfect
           </motion.h1>
@@ -381,7 +381,7 @@ const InteractiveAppfectSection = () => {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -10, scale: 0.9 }}
                         transition={{ duration: 0.2 }}
-                        className="absolute z-20 bg-black/80 backdrop-blur-md border border-purple-500/50 rounded-lg p-4 shadow-xl w-64 md:w-72"
+                        className="absolute z-20 bg-black/80 backdrop-blur-md border border-purple-500/50 rounded-lg p-4 shadow-xl w-64 md:w-72 max-w-[calc(100vw-2rem)]"
                         style={{ 
                           bottom: hotspot.y > 50 ? "calc(100% + 10px)" : "auto",
                           top: hotspot.y <= 50 ? "calc(100% + 10px)" : "auto",

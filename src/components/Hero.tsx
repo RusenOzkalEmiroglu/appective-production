@@ -55,7 +55,7 @@ const AnimatedStat = ({ value, label, icon: Icon, controls, iconColor = "text-pu
   return (
     <motion.div 
       ref={statRef}
-      className="group relative text-center p-3 md:p-6 bg-white/10 backdrop-blur-md rounded-2xl shadow-lg overflow-hidden transition-all duration-300 aspect-square flex flex-col justify-center items-center"
+      className="group relative text-center p-4 md:p-6 bg-white/10 backdrop-blur-md rounded-2xl shadow-lg overflow-hidden transition-all duration-300 sm:aspect-square flex flex-col justify-center items-center"
       initial={{ opacity: 0, y: 50 }}
       animate={controls}
       whileHover={{

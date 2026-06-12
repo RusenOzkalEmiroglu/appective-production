@@ -256,17 +256,17 @@ export default function InteractiveMastheadsPage() {
 
           <div className="relative z-30 mb-10">
             <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
-              <div className="flex space-x-3 mb-4 sm:mb-0 order-2 sm:order-1">
-                <div className="relative" ref={brandDropdownRef}>
+              <div className="flex flex-col sm:flex-row gap-3 mb-4 sm:mb-0 order-2 sm:order-1 w-full sm:w-auto">
+                <div className="relative w-full sm:w-auto" ref={brandDropdownRef}>
                   <button
                     onClick={() => setIsBrandDropdownOpen(!isBrandDropdownOpen)}
-                    className="px-4 py-2 w-48 text-left bg-purple-900/50 rounded-lg flex justify-between items-center hover:bg-purple-800/60 transition-colors duration-300 font-library-3-am border border-purple-500/30">
+                    className="px-4 py-2 w-full sm:w-48 text-left bg-purple-900/50 rounded-lg flex justify-between items-center hover:bg-purple-800/60 transition-colors duration-300 font-library-3-am border border-purple-500/30">
                     <span>{selectedBrand === 'ALL' ? 'All Brands' : selectedBrand}</span>
                     <svg className={`w-4 h-4 transition-transform duration-300 ${isBrandDropdownOpen ? 'transform rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                   </button>
                   <AnimatePresence>
                     {isBrandDropdownOpen && (
-                      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="absolute left-0 mt-2 w-48 bg-dark/90 backdrop-blur-lg border border-purple-500/30 rounded-lg shadow-xl z-50 overflow-hidden">
+                      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="absolute left-0 mt-2 w-full sm:w-48 bg-dark/90 backdrop-blur-lg border border-purple-500/30 rounded-lg shadow-xl z-50 overflow-hidden">
                         {allBrands.map((brand: string) => (
                           <button key={brand} onClick={() => handleGlobalBrandChange(brand)} className="block w-full text-left px-4 py-2 text-sm text-white/80 hover:bg-purple-700/80 transition-colors duration-300 font-library-3-am">
                             {brand}
@@ -277,16 +277,16 @@ export default function InteractiveMastheadsPage() {
                   </AnimatePresence>
                 </div>
                 
-                <div className="relative" ref={adFormatDropdownRef}>
+                <div className="relative w-full sm:w-auto" ref={adFormatDropdownRef}>
                   <button
                     onClick={() => setIsAdFormatDropdownOpen(!isAdFormatDropdownOpen)}
-                    className="px-4 py-2 w-48 text-left bg-purple-900/50 rounded-lg flex justify-between items-center hover:bg-purple-800/60 transition-colors duration-300 font-library-3-am border border-purple-500/30">
+                    className="px-4 py-2 w-full sm:w-48 text-left bg-purple-900/50 rounded-lg flex justify-between items-center hover:bg-purple-800/60 transition-colors duration-300 font-library-3-am border border-purple-500/30">
                     <span>{selectedAdFormat === 'ALL' ? 'ADS FORMAT' : selectedAdFormat}</span>
                     <svg className={`w-4 h-4 transition-transform duration-300 ${isAdFormatDropdownOpen ? 'transform rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                   </button>
                   <AnimatePresence>
                     {isAdFormatDropdownOpen && (
-                      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="absolute left-0 mt-2 w-48 bg-dark/90 backdrop-blur-lg border border-purple-500/30 rounded-lg shadow-xl z-50 overflow-hidden">
+                      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="absolute left-0 mt-2 w-full sm:w-48 bg-dark/90 backdrop-blur-lg border border-purple-500/30 rounded-lg shadow-xl z-50 overflow-hidden">
                         {allAdFormats.map((format: string) => (
                           <button key={format} onClick={() => handleAdFormatChange(format)} className="block w-full text-left px-4 py-2 text-sm text-white/80 hover:bg-purple-700/80 transition-colors duration-300 font-library-3-am">
                             {format}
@@ -298,7 +298,7 @@ export default function InteractiveMastheadsPage() {
                 </div>
               </div>
               
-              <div className="flex flex-col items-end order-1 sm:order-2">
+              <div className="flex flex-col items-center sm:items-end order-1 sm:order-2 w-full sm:w-auto">
                 <span className="text-xs font-library-3-am text-white/70 mb-1.5">Categories</span>
                 <div className="flex flex-wrap justify-center gap-2">
                   {categories.map((category: string) => (

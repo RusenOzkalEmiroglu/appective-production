@@ -85,10 +85,10 @@ const buttonVariants = {
 
 const AppfectFeaturesGrid: React.FC = () => {
   return (
-    <section className="py-16 md:py-24">
+    <section className="py-10 md:py-24">
       <div className="container mx-auto px-4">
         <motion.h2 
-          className="text-3xl sm:text-4xl lg:text-5xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-amber-300 mb-12 md:mb-16"
+          className="text-2xl sm:text-4xl lg:text-5xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-amber-300 mb-8 md:mb-16"
           initial={{ opacity: 0, y: -20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
@@ -97,7 +97,7 @@ const AppfectFeaturesGrid: React.FC = () => {
           Packed with Powerful Features
         </motion.h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10">
           {featuresData.map((feature, index) => (
             <FeatureCard key={feature.id} feature={feature} index={index} />
           ))}
@@ -179,7 +179,7 @@ const FeatureCard = ({ feature, index }: { feature: typeof featuresData[0], inde
       whileInView="visible"
       viewport={{ once: true, amount: 0.3 }}
       custom={index}
-      className="relative w-full aspect-square rounded-3xl"
+      className="relative w-full aspect-[4/3] sm:aspect-square rounded-3xl"
       style={cardStyle}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}

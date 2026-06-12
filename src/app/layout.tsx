@@ -1,5 +1,5 @@
 import '@/styles/globals.css';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter, Montserrat } from 'next/font/google';
 import Footer from '@/components/Footer';
 import { getSocialLinks } from '@/lib/data';
@@ -24,6 +24,12 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: 'Appective | Turkey\'s Best Digital Advertising Agency',
   description: 'Appective - Turkey\'s Best Digital Advertising Agency',
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#07081e',
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

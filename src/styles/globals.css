@@ -3,6 +3,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Phone-first guards: prevent stray horizontal scroll and overflowing media */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+img, video, canvas, iframe {
+  max-width: 100%;
+}
+
 @font-face {
   font-family: 'Library 3 am';
   src: url('/Library 3 am.otf') format('opentype');

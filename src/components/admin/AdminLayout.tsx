@@ -81,6 +81,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeSection, onSe
   ];
 
   const [isOurWorksOpen, setIsOurWorksOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
     if (ourWorksSubMenu.some(item => item.path === activeSection) || activeSection === 'our-works') {
@@ -90,7 +91,20 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeSection, onSe
 
   return (
     <div className={`flex h-screen ${darkBg}`}>
-      <aside className={`w-64 ${sidebarBg} flex flex-col`}>
+      {/* Mobile backdrop — closes drawer when tapped */}
+      {drawerOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 md:hidden"
+          onClick={() => setDrawerOpen(false)}
+        />
+      )}
+
+      {/* Sidebar — drawer on phone, static on md+ */}
+      <aside
+        className={`w-64 ${sidebarBg} flex flex-col fixed inset-y-0 left-0 z-40 transform transition-transform duration-200 md:static md:translate-x-0 ${
+          drawerOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
         <div className="p-4 border-b border-gray-700">
           <Link href="/" legacyBehavior>
             <a className={`text-2xl font-bold ${primaryTextColor}`}>Appective Admin</a>
@@ -104,14 +118,17 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeSection, onSe
                   icon={item.icon}
                   text={item.name}
                   active={activeSection === item.path}
-                  onClick={() => onSectionChange(item.path)}
+                  onClick={() => {
+                    onSectionChange(item.path);
+                    setDrawerOpen(false);
+                  }}
                 />
               </li>
             ))}
-            
+
             <li>
               <div>
-                <button 
+                <button
                   className={`w-full flex items-center justify-between p-3 rounded-md transition-colors ${isOurWorksOpen ? 'bg-purple-600 text-white' : 'hover:bg-gray-700'}`}
                   onClick={() => setIsOurWorksOpen(!isOurWorksOpen)}
                 >
@@ -124,10 +141,13 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeSection, onSe
                 {isOurWorksOpen && (
                   <div className="mt-2 pl-6 space-y-1">
                     {ourWorksSubMenu.map(item => (
-                      <button 
+                      <button
                         key={item.path}
                         className={`w-full flex items-center p-2 rounded-md transition-colors text-sm ${activeSection === item.path ? 'bg-purple-500 text-white' : 'hover:bg-gray-700'}`}
-                        onClick={() => onSectionChange(item.path)}
+                        onClick={() => {
+                          onSectionChange(item.path);
+                          setDrawerOpen(false);
+                        }}
                       >
                         {item.icon}
                         <span className="ml-3">{item.name}</span>
@@ -140,12 +160,37 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeSection, onSe
           </ul>
         </nav>
         <div className="p-4 border-t border-gray-700">
-          <SidebarItem icon={<LogOut size={20} />} text="Logout" active={false} onClick={onLogout} />
+          <SidebarItem
+            icon={<LogOut size={20} />}
+            text="Logout"
+            active={false}
+            onClick={() => {
+              setDrawerOpen(false);
+              onLogout();
+            }}
+          />
         </div>
       </aside>
 
-      <main className="flex-1 p-6 overflow-y-auto">
-        {children}
+      <main className="flex-1 overflow-y-auto">
+        {/* Phone-only top bar with hamburger */}
+        <div className="md:hidden flex items-center gap-3 p-4 bg-gray-800 sticky top-0 z-20">
+          <button
+            onClick={() => setDrawerOpen(true)}
+            aria-label="Open menu"
+            className="p-2 rounded-md bg-gray-700 text-white"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
+          <span className="text-white font-semibold">Admin</span>
+        </div>
+        <div className="p-4 md:p-6">
+          {children}
+        </div>
       </main>
     </div>
   );

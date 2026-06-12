@@ -253,10 +253,10 @@ const ContactSection = ({ socialLinks, contactInfo }: { socialLinks: SocialLink[
                 ></textarea>
               </div>
               
-              <div className="flex items-center">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                 <motion.button
                   type="submit"
-                  className="magnetic interactive-btn bg-primary hover:bg-primary-dark text-white px-8 py-4 rounded-full text-lg font-medium transition-all duration-300 shadow-lg shadow-primary/20 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center min-w-[180px]"
+                  className="magnetic interactive-btn bg-primary hover:bg-primary-dark text-white px-8 py-4 rounded-full text-lg font-medium transition-all duration-300 shadow-lg shadow-primary/20 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center w-full sm:w-auto sm:min-w-[180px]"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   disabled={isSubmitting}
@@ -277,10 +277,10 @@ const ContactSection = ({ socialLinks, contactInfo }: { socialLinks: SocialLink[
                     'Send'
                   )}
                 </motion.button>
-                
+
                 {isSubmitted && (
-                  <motion.p 
-                    className="ml-4 text-green-400"
+                  <motion.p
+                    className="text-green-400 text-sm sm:text-base"
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                   >

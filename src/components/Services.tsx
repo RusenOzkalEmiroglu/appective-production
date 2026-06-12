@@ -22,7 +22,7 @@ interface ImageMagnifierProps {
 const ImageMagnifier: React.FC<ImageMagnifierProps> = ({
   src,
   alt,
-  containerWidth = '720px',
+  containerWidth = '100%',
   containerHeight = '405px',
   magnifierHeight = 220,
   magnifierWidth = 220,
@@ -390,7 +390,7 @@ const Services = () => {
   }
 
   return (
-    <section id="services" ref={sectionRef} className="section py-24 relative overflow-hidden">
+    <section id="services" ref={sectionRef} className="section py-12 md:py-24 relative overflow-hidden">
 
       <div className="container mx-auto px-4 relative z-10">
         <h2

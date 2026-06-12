@@ -135,16 +135,16 @@ const RelevantAppfectSection: React.FC = () => {
       ref={sectionRef}
       onMouseMove={handleMouseMove} 
       onMouseLeave={handleMouseLeaveSection}
-      className="relative py-16 md:py-24 text-white"
+      className="relative py-10 md:py-24 text-white"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
       {/* Content Container */}
       <div className="container mx-auto px-4 relative z-10">
-        <motion.div variants={menuItemVariants} className="text-center mb-10 md:mb-14">
+        <motion.div variants={menuItemVariants} className="text-center mb-6 md:mb-14">
           <motion.h1
-            className="text-4xl sm:text-5xl md:text-[52px] font-extrabold mb-5 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-red-400"
+            className="text-3xl sm:text-5xl md:text-[52px] font-extrabold mb-5 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-500 to-red-400"
           >
             Explore Appfect's Core
           </motion.h1>
